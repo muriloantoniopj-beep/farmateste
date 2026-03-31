@@ -1,0 +1,984 @@
+The user wants a beautiful dark-themed website with all information on the first page. Let me create a comprehensive, visually stunning single-page dashboard with all the real data from the files, plus the data entry form. I'll make it dark themed and beautiful.
+
+Html
+Copiar
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farmaformula Group — Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --bg: #050508;
+  --bg2: #0a0a0f;
+  --card: #0e0e16;
+  --card2: #13131e;
+  --card3: #181826;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.1);
+  --cyan: #00e5ff;
+  --cyan2: #00b4cc;
+  --purple: #7c3aed;
+  --purple2: #a855f7;
+  --green: #10b981;
+  --green2: #34d399;
+  --yellow: #f59e0b;
+  --yellow2: #fbbf24;
+  --red: #ef4444;
+  --red2: #f87171;
+  --pink: #ec4899;
+  --text: #f1f5f9;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --gold: #fbbf24;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* BACKGROUND GLOW */
+body::before {
+  content: '';
+  position: fixed;
+  top: -200px; left: -200px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -200px; right: -200px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(0,229,255,0.06) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+/* ============ HEADER ============ */
+.header {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(5,5,8,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 68px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.logo-wrap { display: flex; align-items: center; gap: 14px; }
+.logo-box {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, var(--purple), var(--cyan));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 16px; color: #fff;
+  box-shadow: 0 0 20px rgba(124,58,237,0.4);
+}
+.logo-text h1 { font-size: 16px; font-weight: 800; letter-spacing: 2px; color: var(--text); }
+.logo-text span { font-size: 10px; color: var(--text3); letter-spacing: 1px; }
+.header-center { display: flex; gap: 4px; }
+.nav-btn {
+  padding: 7px 16px; border-radius: 8px; border: none;
+  background: none; color: var(--text2);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: all .2s; font-family: 'Inter', sans-serif;
+}
+.nav-btn:hover, .nav-btn.active {
+  background: rgba(255,255,255,0.07); color: var(--text);
+}
+.nav-btn.active { color: var(--cyan); }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.clock-box {
+  background: rgba(0,229,255,0.08);
+  border: 1px solid rgba(0,229,255,0.2);
+  border-radius: 8px; padding: 6px 14px;
+  font-family: monospace; font-size: 13px; color: var(--cyan); font-weight: 700;
+}
+.store-pill {
+  padding: 6px 14px; border-radius: 20px;
+  border: 1px solid var(--border2);
+  background: none; color: var(--text2);
+  font-size: 11px; font-weight: 600; cursor: pointer;
+  transition: all .2s; font-family: 'Inter', sans-serif;
+}
+.store-pill:hover { border-color: var(--cyan); color: var(--cyan); }
+.store-pill.active {
+  background: linear-gradient(135deg, var(--purple), var(--cyan));
+  border-color: transparent; color: #fff;
+}
+
+/* ============ MAIN ============ */
+.main { padding: 28px 32px; max-width: 1800px; margin: 0 auto; position: relative; z-index: 1; }
+
+/* ============ SECTION TITLE ============ */
+.sec-title {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 18px;
+}
+.sec-title h2 {
+  font-size: 13px; font-weight: 700; color: var(--text);
+  text-transform: uppercase; letter-spacing: 1.5px;
+}
+.sec-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--border2), transparent);
+}
+.sec-icon {
+  width: 28px; height: 28px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center; font-size: 13px;
+}
+
+/* ============ TABS ============ */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ============ GRID SYSTEM ============ */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 16px; }
+.g5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; margin-bottom: 16px; }
+.g6 { display: grid; grid-template-columns: repeat(6,1fr); gap: 14px; margin-bottom: 16px; }
+@media(max-width:1200px){.g6{grid-template-columns:repeat(3,1fr)}.g5{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:900px){.g2,.g3,.g4,.g5,.g6{grid-template-columns:1fr}}
+
+/* ============ CARD BASE ============ */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: border-color .3s;
+}
+.card:hover { border-color: rgba(255,255,255,0.12); }
+.card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-title { font-size: 12px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: 1px; }
+.card-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.card-body { padding: 20px; }
+
+/* ============ KPI CARDS ============ */
+.kpi {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  position: relative; overflow: hidden;
+  transition: all .3s;
+}
+.kpi:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.12); }
+.kpi-glow {
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  border-radius: 16px 16px 0 0;
+}
+.kpi-glow-cyan { background: linear-gradient(90deg, transparent, var(--cyan), transparent); }
+.kpi-glow-purple { background: linear-gradient(90deg, transparent, var(--purple2), transparent); }
+.kpi-glow-green { background: linear-gradient(90deg, transparent, var(--green), transparent); }
+.kpi-glow-yellow { background: linear-gradient(90deg, transparent, var(--yellow), transparent); }
+.kpi-glow-red { background: linear-gradient(90deg, transparent, var(--red), transparent); }
+.kpi-glow-pink { background: linear-gradient(90deg, transparent, var(--pink), transparent); }
+.kpi-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px; }
+.kpi-value { font-size: 26px; font-weight: 800; margin-bottom: 4px; line-height: 1; }
+.kpi-meta { font-size: 11px; color: var(--text3); margin-bottom: 10px; }
+.kpi-bar { height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+.kpi-bar-fill { height: 100%; border-radius: 2px; transition: width .8s cubic-bezier(0.4,0,0.2,1); }
+.kpi-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px;
+  margin-top: 8px;
+}
+.kpi-icon { position: absolute; right: 18px; top: 18px; font-size: 22px; opacity: .15; }
+
+/* ============ BADGE ============ */
+.badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; }
+.badge-cyan { background: rgba(0,229,255,0.12); color: var(--cyan); border: 1px solid rgba(0,229,255,0.2); }
+.badge-green { background: rgba(16,185,129,0.12); color: var(--green2); border: 1px solid rgba(16,185,129,0.2); }
+.badge-yellow { background: rgba(245,158,11,0.12); color: var(--yellow2); border: 1px solid rgba(245,158,11,0.2); }
+.badge-red { background: rgba(239,68,68,0.12); color: var(--red2); border: 1px solid rgba(239,68,68,0.2); }
+.badge-purple { background: rgba(124,58,237,0.12); color: var(--purple2); border: 1px solid rgba(124,58,237,0.2); }
+.badge-pink { background: rgba(236,72,153,0.12); color: var(--pink); border: 1px solid rgba(236,72,153,0.2); }
+
+/* ============ TABLE ============ */
+.tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+.tbl th {
+  padding: 10px 14px; text-align: left;
+  background: rgba(255,255,255,0.03);
+  color: var(--text3); font-size: 10px;
+  text-transform: uppercase; letter-spacing: 1px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+}
+.tbl td { padding: 11px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text2); }
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: rgba(255,255,255,0.02); }
+.tbl-total td { font-weight: 800; color: var(--cyan) !important; background: rgba(0,229,255,0.05) !important; }
+
+/* ============ PROGRESS ============ */
+.prog { height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+.prog-fill { height: 100%; border-radius: 3px; transition: width .8s; }
+
+/* ============ WEEK CARDS ============ */
+.week-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 16px; }
+.week-card {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px;
+  position: relative; overflow: hidden;
+}
+.week-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+}
+.wc1::before { background: linear-gradient(90deg, var(--cyan), var(--purple2)); }
+.wc2::before { background: linear-gradient(90deg, var(--green), var(--cyan)); }
+.wc3::before { background: linear-gradient(90deg, var(--red), var(--yellow)); }
+.wc4::before { background: linear-gradient(90deg, var(--purple2), var(--pink)); }
+.week-num { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.week-val { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
+.week-pct { font-size: 12px; font-weight: 700; }
+
+/* ============ VENDOR CARD ============ */
+.vcard {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 18px;
+  position: relative; overflow: hidden;
+  transition: all .3s;
+}
+.vcard:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+.vcard-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.vcard-name { font-size: 13px; font-weight: 700; }
+.vcard-loja { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.rank-badge {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 12px;
+}
+.r1 { background: linear-gradient(135deg,#f59e0b,#fbbf24); color: #000; box-shadow: 0 0 12px rgba(245,158,11,0.5); }
+.r2 { background: linear-gradient(135deg,#94a3b8,#cbd5e1); color: #000; }
+.r3 { background: linear-gradient(135deg,#b45309,#d97706); color: #fff; }
+.r4 { background: rgba(255,255,255,0.1); color: var(--text3); }
+.vcard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.vcard-metric .lbl { font-size: 10px; color: var(--text3); }
+.vcard-metric .val { font-size: 16px; font-weight: 800; }
+.hat-trick { background: linear-gradient(135deg,var(--purple),var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+/* ============ COMMISSION ============ */
+.comm-box {
+  background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(0,229,255,0.08));
+  border: 1px solid rgba(124,58,237,0.2);
+  border-radius: 12px; padding: 14px; margin-top: 12px;
+}
+.comm-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 11px; color: var(--text3); }
+.comm-total { font-size: 18px; font-weight: 900; background: linear-gradient(135deg,var(--purple2),var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+/* ============ FORM ============ */
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px,1fr)); gap: 14px; }
+.fg { display: flex; flex-direction: column; gap: 6px; }
+.fg label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+.fg input, .fg select {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 11px 14px;
+  color: var(--text); font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  transition: all .2s; width: 100%;
+}
+.fg input:focus, .fg select:focus {
+  outline: none;
+  border-color: rgba(0,229,255,0.4);
+  background: rgba(0,229,255,0.04);
+  box-shadow: 0 0 0 3px rgba(0,229,255,0.06);
+}
+.fg input::placeholder { color: var(--text3); }
+
+/* ============ BUTTONS ============ */
+.btn {
+  padding: 11px 24px; border-radius: 10px; border: none;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  transition: all .2s; font-family: 'Inter', sans-serif;
+  display: inline-flex; align-items: center; gap: 7px;
+}
+.btn-cyan {
+  background: linear-gradient(135deg, var(--cyan2), var(--cyan));
+  color: #000; box-shadow: 0 4px 15px rgba(0,229,255,0.25);
+}
+.btn-cyan:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,229,255,0.35); }
+.btn-purple {
+  background: linear-gradient(135deg, var(--purple), var(--purple2));
+  color: #fff; box-shadow: 0 4px 15px rgba(124,58,237,0.25);
+}
+.btn-ghost {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border); color: var(--text2);
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.08); }
+.btn-sm { padding: 7px 14px; font-size: 11px; border-radius: 8px; }
+.btn-danger { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: var(--red2); }
+
+/* ============ ALERT ============ */
+.alert {
+  border-radius: 10px; padding: 11px 16px;
+  font-size: 12px; display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px;
+}
+.alert-red { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: var(--red2); }
+.alert-yellow { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); color: var(--yellow2); }
+.alert-green { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); color: var(--green2); }
+.alert-cyan { background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.2); color: var(--cyan); }
+
+/* ============ SEPARATOR ============ */
+.sep { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+/* ============ STORE SUMMARY CARDS ============ */
+.store-card {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px;
+  position: relative; overflow: hidden;
+}
+.store-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+.store-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.store-sub { font-size: 10px; color: var(--text3); margin-bottom: 14px; }
+.store-metric { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.store-metric:last-child { border-bottom: none; }
+.sm-label { font-size: 11px; color: var(--text3); }
+.sm-val { font-size: 13px; font-weight: 700; }
+
+/* ============ MODAL ============ */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+  z-index: 500; align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card2);
+  border: 1px solid var(--border2);
+  border-radius: 20px; padding: 28px;
+  width: 90%; max-width: 680px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+}
+.modal-title { font-size: 16px; font-weight: 800; margin-bottom: 20px; }
+.modal-close {
+  float: right; background: none; border: none; color: var(--text3);
+  cursor: pointer; font-size: 20px; line-height: 1;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ============ TOAST ============ */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  padding: 14px 20px; border-radius: 12px;
+  font-weight: 700; font-size: 13px; z-index: 999;
+  display: none; animation: slideUp .3s ease;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+}
+.toast.success { background: linear-gradient(135deg,var(--green),var(--green2)); color: #000; }
+.toast.error { background: linear-gradient(135deg,var(--red),var(--red2)); color: #fff; }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* ============ PREVIEW BOX ============ */
+.preview-box {
+  background: linear-gradient(135deg, rgba(0,229,255,0.04), rgba(124,58,237,0.04));
+  border: 1px solid rgba(0,229,255,0.15);
+  border-radius: 14px; padding: 16px; margin: 16px 0;
+}
+.preview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 12px; }
+.preview-item .p-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; }
+.preview-item .p-val { font-size: 18px; font-weight: 800; }
+
+/* ============ CHART ============ */
+.chart-wrap { position: relative; }
+.ch-200 { height: 200px; }
+.ch-250 { height: 250px; }
+.ch-300 { height: 300px; }
+
+/* ============ DEFASAGEM ============ */
+.def-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.def-row:last-child { border-bottom: none; }
+.def-avatar {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 13px; flex-shrink: 0;
+}
+.def-name { font-size: 12px; font-weight: 700; }
+.def-sub { font-size: 10px; color: var(--text3); }
+.def-val { margin-left: auto; text-align: right; }
+.def-val .big { font-size: 15px; font-weight: 800; color: var(--red2); }
+.def-val .sm { font-size: 10px; color: var(--text3); }
+
+/* GRADIENT TEXTS */
+.grad-cyan { background: linear-gradient(135deg,var(--cyan),var(--purple2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.grad-green { background: linear-gradient(135deg,var(--green),var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.grad-red { background: linear-gradient(135deg,var(--red),var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.grad-gold { background: linear-gradient(135deg,var(--yellow),var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+/* GLOW EFFECTS */
+.glow-cyan { box-shadow: 0 0 20px rgba(0,229,255,0.15); }
+.glow-purple { box-shadow: 0 0 20px rgba(124,58,237,0.15); }
+.glow-green { box-shadow: 0 0 20px rgba(16,185,129,0.15); }
+.glow-red { box-shadow: 0 0 20px rgba(239,68,68,0.15); }
+
+/* MARGIN UTILS */
+.mb8 { margin-bottom: 8px; }
+.mb12 { margin-bottom: 12px; }
+.mb16 { margin-bottom: 16px; }
+.mb20 { margin-bottom: 20px; }
+.mb24 { margin-bottom: 24px; }
+.mt8 { margin-top: 8px; }
+.mt12 { margin-top: 12px; }
+.mt16 { margin-top: 16px; }
+.fw8 { font-weight: 800; }
+.fs10 { font-size: 10px; }
+.fs11 { font-size: 11px; }
+.fs12 { font-size: 12px; }
+.fs13 { font-size: 13px; }
+.c-text2 { color: var(--text2); }
+.c-text3 { color: var(--text3); }
+.c-cyan { color: var(--cyan); }
+.c-green { color: var(--green2); }
+.c-red { color: var(--red2); }
+.c-yellow { color: var(--yellow2); }
+.c-purple { color: var(--purple2); }
+.c-pink { color: var(--pink); }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.flex-gap { display: flex; align-items: center; gap: 8px; }
+.ovx { overflow-x: auto; }
+
+/* INDICATOR DOT */
+.ind { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.ind-green { background: var(--green2); box-shadow: 0 0 6px var(--green); }
+.ind-yellow { background: var(--yellow2); box-shadow: 0 0 6px var(--yellow); }
+.ind-red { background: var(--red2); box-shadow: 0 0 6px var(--red); }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="header">
+  <div class="logo-wrap">
+    <div class="logo-box">FF</div>
+    <div class="logo-text">
+      <h1>FARMAFORMULA GROUP</h1>
+      <span>SISTEMA DE DESEMPENHO COMERCIAL</span>
+    </div>
+  </div>
+  <nav class="header-center">
+    <button class="nav-btn active" onclick="switchTab('dash')">Dashboard</button>
+    <button class="nav-btn" onclick="switchTab('lancamento')">Lançamento</button>
+    <button class="nav-btn" onclick="switchTab('vendedores')">Vendedores</button>
+    <button class="nav-btn" onclick="switchTab('comissoes')">Comissões</button>
+    <button class="nav-btn" onclick="switchTab('metas')">Metas</button>
+    <button class="nav-btn" onclick="switchTab('historico')">Histórico</button>
+  </nav>
+  <div class="header-right">
+    <div class="clock-box" id="clock">00:00:00</div>
+    <button class="store-pill active" onclick="filterStore('all',this)">🏢 Grupo</button>
+    <button class="store-pill" onclick="filterStore(1,this)">Cruz das Almas</button>
+    <button class="store-pill" onclick="filterStore(2,this)">Cachoeira</button>
+    <button class="store-pill" onclick="filterStore(3,this)">Valença</button>
+  </div>
+</header>
+
+<!-- ============ MAIN ============ -->
+<main class="main">
+
+<!-- ===================== TAB: DASHBOARD ===================== -->
+<div id="tab-dash" class="tab-content active">
+
+  <!-- ALERTAS -->
+  <div id="alertas-wrap" class="mb16"></div>
+
+  <!-- HERO KPIs -->
+  <div class="g6 mb16" id="kpi-row"></div>
+
+  <!-- SEMANAS + CHARTS ROW -->
+  <div class="g2 mb16">
+    <div>
+      <!-- SEMANAS -->
+      <div class="sec-title mb12">
+        <div class="sec-icon" style="background:rgba(0,229,255,0.1)">📅</div>
+        <h2>Semanas — Cruz das Almas · Fev/26</h2>
+      </div>
+      <div class="week-grid" id="week-grid"></div>
+
+      <!-- LOJAS RESUMO -->
+      <div class="sec-title mb12 mt16">
+        <div class="sec-icon" style="background:rgba(124,58,237,0.1)">🏪</div>
+        <h2>Resumo por Loja</h2>
+      </div>
+      <div class="g3" id="lojas-row"></div>
+    </div>
+
+    <div>
+      <!-- CHART EVOLUÇÃO MENSAL -->
+      <div class="card" style="height:100%">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Evolução de Faturamento</div>
+            <div class="card-sub">Mai/25 → Fev/26 · Sede Cruz das Almas</div>
+          </div>
+          <span class="badge badge-cyan">Histórico</span>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap ch-300"><canvas id="chartEvol"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VENDORS + CHARTS -->
+  <div class="sec-title mb12">
+    <div class="sec-icon" style="background:rgba(16,185,129,0.1)">👥</div>
+    <h2>Desempenho dos Vendedores — Fev/26</h2>
+  </div>
+  <div class="g4 mb16" id="vcards-dash"></div>
+
+  <!-- 3 CHARTS -->
+  <div class="g3 mb16">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Faturamento por Vendedor</div></div>
+      <div class="card-body"><div class="chart-wrap ch-200"><canvas id="chartFatVend"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Taxa de Conversão</div></div>
+      <div class="card-body"><div class="chart-wrap ch-200"><canvas id="chartConv"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Ticket Médio</div></div>
+      <div class="card-body"><div class="chart-wrap ch-200"><canvas id="chartTicket"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- RANKING TABLE + DEFASAGEM -->
+  <div class="g2 mb16">
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">Ranking Geral</div><div class="card-sub">Fevereiro 2026</div></div>
+        <span class="badge badge-purple">IEC Score</span>
+      </div>
+      <div class="card-body">
+        <div class="ovx"><table class="tbl" id="tbl-ranking"></table></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">⚠️ Defasagem de Vendas</div><div class="card-sub">Orçamentos rejeitados · Fev/26</div></div>
+        <span class="badge badge-red">R$ 43.402</span>
+      </div>
+      <div class="card-body" id="def-panel"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM: MIX + CHARTS CACHOEIRA/VALENÇA -->
+  <div class="g3">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Mix de Produtos — Fev/26</div></div>
+      <div class="card-body"><div class="chart-wrap ch-200"><canvas id="chartMix"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Cachoeira — Equipe</div><div class="card-sub">Jan/26 vs Fev/26</div></div>
+      <div class="card-body"><div class="chart-wrap ch-200"><canvas id="chartCachoeira"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Valença — Evolução</div><div class="card-sub">Jan/26 vs Fev/26</div></div>
+      <div class="card-body"><div class="chart-wrap ch-200"><canvas id="chartValenca"></canvas></div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== TAB: LANÇAMENTO ===================== -->
+<div id="tab-lancamento" class="tab-content">
+
+  <div class="sec-title mb16">
+    <div class="sec-icon" style="background:rgba(0,229,255,0.1)">➕</div>
+    <h2>Lançamento Diário de Vendas</h2>
+  </div>
+
+  <div class="g2 mb16">
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">Novo Lançamento</div><div class="card-sub">Preencha os dados do vendedor no dia</div></div>
+      </div>
+      <div class="card-body">
+        <div class="form-grid mb16">
+          <div class="fg">
+            <label>Data</label>
+            <input type="date" id="l-data">
+          </div>
+          <div class="fg">
+            <label>Loja</label>
+            <select id="l-loja" onchange="updateVendedores()">
+              <option value="1">Cruz das Almas</option>
+              <option value="2">Cachoeira</option>
+              <option value="3">Valença</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Vendedor</label>
+            <select id="l-vendedor"></select>
+          </div>
+        </div>
+        <hr class="sep">
+        <div class="form-grid mb16">
+          <div class="fg"><label>Valor Total Vendas (R$)</label><input type="number" id="l-valor" placeholder="0,00" step="0.01" oninput="calcPreview()"></div>
+          <div class="fg"><label>Valor Revenda (R$)</label><input type="number" id="l-revenda" placeholder="0,00" step="0.01" oninput="calcPreview()"></div>
+          <div class="fg"><label>Clientes Atendidos</label><input type="number" id="l-clientes" placeholder="0" oninput="calcPreview()"></div>
+          <div class="fg"><label>Orçamentos Gerados</label><input type="number" id="l-orcamentos" placeholder="0" oninput="calcPreview()"></div>
+          <div class="fg"><label>Orçamentos Rejeitados</label><input type="number" id="l-rejeitados" placeholder="0" oninput="calcPreview()"></div>
+          <div class="fg"><label>Valor Rejeitado (R$)</label><input type="number" id="l-vrejeitado" placeholder="0,00" step="0.01"></div>
+          <div class="fg"><label>Fórmulas Alopatia</label><input type="number" id="l-alo-form" placeholder="0"></div>
+          <div class="fg"><label>Vendas Alopatia</label><input type="number" id="l-alo-vend" placeholder="0"></div>
+          <div class="fg"><label>Fórmulas Homeopático</label><input type="number" id="l-hom-form" placeholder="0"></div>
+          <div class="fg"><label>Vendas Homeopático</label><input type="number" id="l-hom-vend" placeholder="0"></div>
+          <div class="fg"><label>Desconto Concedido (R$)</label><input type="number" id="l-desconto" placeholder="0,00" step="0.01"></div>
+          <div class="fg"><label>Semana do Mês</label>
+            <select id="l-semana">
+              <option value="1">Semana 1</option>
+              <option value="2">Semana 2</option>
+              <option value="3">Semana 3</option>
+              <option value="4">Semana 4</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="lanc-preview" class="mb16"></div>
+
+        <div class="flex-gap">
+          <button class="btn btn-cyan" onclick="salvarLanc()">💾 Salvar Lançamento</button>
+          <button class="btn btn-ghost" onclick="limparLanc()">🗑 Limpar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAINEL DE LANÇAMENTOS DO DIA -->
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">Lançamentos Registrados</div></div>
+        <div class="flex-gap">
+          <input type="date" id="filtro-data" onchange="renderLancs()" style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text);font-size:11px;font-family:'Inter',sans-serif">
+          <select id="filtro-loja" onchange="renderLancs()" style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text);font-size:11px;font-family:'Inter',sans-serif">
+            <option value="">Todas</option>
+            <option value="1">Cruz das Almas</option>
+            <option value="2">Cachoeira</option>
+            <option value="3">Valença</option>
+          </select>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="ovx">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Data</th><th>Loja</th><th>Vendedor</th><th>Valor</th>
+                <th>Clientes</th><th>Orçam.</th><th>Ticket</th><th>Conversão</th><th>Ação</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-lancs">
+              <tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text3)">Nenhum lançamento ainda. Use o formulário ao lado.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- TOTAIS DO DIA -->
+        <div id="totais-dia" class="preview-box mt16" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== TAB: VENDEDORES ===================== -->
+<div id="tab-vendedores" class="tab-content">
+
+  <div class="sec-title mb16">
+    <div class="sec-icon" style="background:rgba(16,185,129,0.1)">👤</div>
+    <h2>Perfil Detalhado dos Vendedores</h2>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="flex-gap mb20">
+    <button class="btn btn-cyan btn-sm active-store" onclick="filterVend('todos',this)">Todos</button>
+    <button class="btn btn-ghost btn-sm" onclick="filterVend(1,this)">Cruz das Almas</button>
+    <button class="btn btn-ghost btn-sm" onclick="filterVend(2,this)">Cachoeira</button>
+    <button class="btn btn-ghost btn-sm" onclick="filterVend(3,this)">Valença</button>
+  </div>
+
+  <div class="g3 mb20" id="vcards-vend"></div>
+
+  <!-- TABELA DETALHADA -->
+  <div class="card mb16">
+    <div class="card-header">
+      <div><div class="card-title">Análise Comparativa — Fevereiro 2026</div></div>
+    </div>
+    <div class="card-body ovx">
+      <table class="tbl" id="tbl-vend-detail"></table>
+    </div>
+  </div>
+
+  <!-- COMPARATIVO JAN x FEV -->
+  <div class="g2">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Comparativo Jan x Fev — Faturamento</div></div>
+      <div class="card-body"><div class="chart-wrap ch-250"><canvas id="chartJanFev"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Comparativo Jan x Fev — Indicadores</div></div>
+      <div class="card-body"><div class="chart-wrap ch-250"><canvas id="chartIndic"></canvas></div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== TAB: COMISSÕES ===================== -->
+<div id="tab-comissoes" class="tab-content">
+
+  <div class="sec-title mb16">
+    <div class="sec-icon" style="background:rgba(245,158,11,0.1)">💰</div>
+    <h2>Cálculo de Comissões e Bonificações</h2>
+  </div>
+
+  <!-- REGRAS RÁPIDAS -->
+  <div class="card mb16">
+    <div class="card-header">
+      <div><div class="card-title">Tabela de Comissões Vigentes</div><div class="card-sub">Programa Alta Performance · Set/25</div></div>
+      <button class="btn btn-ghost btn-sm" onclick="openModal('modal-regras')">📋 Ver Regras Completas</button>
+    </div>
+    <div class="card-body">
+      <div class="g4">
+        <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:14px;text-align:center">
+          <div class="fs10 c-text3 mb8" style="text-transform:uppercase;letter-spacing:1px">Abaixo de 90%</div>
+          <div style="font-size:28px;font-weight:900;color:var(--red2)">0,2%</div>
+          <div class="fs10 c-text3 mt8">Sobre total vendido</div>
+        </div>
+        <div style="background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);border-radius:12px;padding:14px;text-align:center">
+          <div class="fs10 c-text3 mb8" style="text-transform:uppercase;letter-spacing:1px">90% a 99,9%</div>
+          <div style="font-size:28px;font-weight:900;color:var(--cyan)">0,3%</div>
+          <div class="fs10 c-text3 mt8">Sobre total vendido</div>
+        </div>
+        <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:14px;text-align:center">
+          <div class="fs10 c-text3 mb8" style="text-transform:uppercase;letter-spacing:1px">100% a 109,9%</div>
+          <div style="font-size:28px;font-weight:900;color:var(--green2)">0,4%</div>
+          <div class="fs10 c-text3 mt8">Sobre total vendido</div>
+        </div>
+        <div style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:12px;padding:14px;text-align:center">
+          <div class="fs10 c-text3 mb8" style="text-transform:uppercase;letter-spacing:1px">110% ou mais</div>
+          <div style="font-size:28px;font-weight:900;color:var(--purple2)">0,6%</div>
+          <div class="fs10 c-text3 mt8">Sobre total vendido</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SELETOR PERÍODO -->
+  <div class="flex-gap mb16">
+    <div class="fg" style="min-width:200px">
+      <label>Período</label>
+      <select id="comm-periodo" onchange="renderComm()">
+        <option value="fev26">Fevereiro 2026</option>
+        <option value="jan26">Janeiro 2026</option>
+      </select>
+    </div>
+    <div class="fg" style="min-width:200px">
+      <label>Loja</label>
+      <select id="comm-loja" onchange="renderComm()">
+        <option value="1">Cruz das Almas</option>
+        <option value="2">Cachoeira</option>
+        <option value="3">Valença</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="g4 mb16" id="comm-cards"></div>
+
+  <div class="card mb16">
+    <div class="card-header"><div class="card-title">Resumo de Pagamentos</div></div>
+    <div class="card-body ovx"><table class="tbl" id="tbl-comm"></table></div>
+  </div>
+
+  <!-- SIMULADOR -->
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">🧮 Simulador de Comissão</div><div class="card-sub">Calcule cenários futuros em tempo real</div></div>
+    </div>
+    <div class="card-body">
+      <div class="form-grid mb16">
+        <div class="fg"><label>Vendedor</label>
+          <select id="sim-vend">
+            <option value="JAILDA">Jailda</option><option value="THAINA">Thaina</option>
+            <option value="DIRLENE">Dirlene</option><option value="TARCIZIO">Tarcizio</option>
+            <option value="DAVID">David</option><option value="JACKSON">Jackson</option>
+            <option value="BRUNA">Bruna Bahia</option><option value="STEFANE">Stefane</option>
+            <option value="JESSIKA">Jessika</option>
+          </select>
+        </div>
+        <div class="fg"><label>Meta Individual (R$)</label><input type="number" id="sim-meta" value="55253"></div>
+        <div class="fg"><label>Faturamento Realizado (R$)</label><input type="number" id="sim-fat" value="44576" oninput="simularComm()"></div>
+        <div class="fg"><label>Semanas com bônus</label><input type="number" id="sim-sem" value="2" min="0" max="4" oninput="simularComm()"></div>
+        <div class="fg"><label>Hat Tricks</label><input type="number" id="sim-hat" value="0" min="0" max="4" oninput="simularComm()"></div>
+        <div class="fg"><label>Canal</label>
+          <select id="sim-canal" onchange="simularComm()">
+            <option value="balcao">Balcão</option>
+            <option value="tele">Teleformula</option>
+          </select>
+        </div>
+      </div>
+      <div id="sim-result"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== TAB: METAS ===================== -->
+<div id="tab-metas" class="tab-content">
+
+  <div class="sec-title mb16">
+    <div class="sec-icon" style="background:rgba(245,158,11,0.1)">🎯</div>
+    <h2>Gestão de Metas</h2>
+  </div>
+
+  <div class="g2 mb16">
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">Metas Globais por Loja</div><div class="card-sub">Configuração mensal</div></div>
+        <button class="btn btn-cyan btn-sm" onclick="openModal('modal-metas')">✏️ Editar</button>
+      </div>
+      <div class="card-body">
+        <table class="tbl" id="tbl-metas-loja"></table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Distribuição da Meta — Cruz das Almas</div></div>
+      <div class="card-body"><div class="chart-wrap ch-250"><canvas id="chartMetaDist"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- METAS SEMANAIS -->
+  <div class="card mb16">
+    <div class="card-header"><div class="card-title">Metas Semanais — Cruz das Almas</div></div>
+    <div class="card-body">
+      <div class="week-grid" id="metas-semanas"></div>
+    </div>
+  </div>
+
+  <!-- METAS INDIVIDUAIS -->
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">Metas Individuais por Vendedor</div></div>
+    </div>
+    <div class="card-body ovx">
+      <table class="tbl" id="tbl-metas-ind"></table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== TAB: HISTÓRICO ===================== -->
+<div id="tab-historico" class="tab-content">
+
+  <div class="sec-title mb16">
+    <div class="sec-icon" style="background:rgba(236,72,153,0.1)">📈</div>
+    <h2>Histórico e Tendências</h2>
+  </div>
+
+  <div class="g5 mb16">
+    <div class="kpi"><div class="kpi-glow kpi-glow-purple"></div>
+      <div class="kpi-label">Mai/25</div>
+      <div class="kpi-value grad-cyan" style="font-size:20px">R$184.837</div>
+      <div class="kpi-meta">+15,5% vs meta</div>
+      <span class="badge badge-green">✓ Superada</span>
+    </div>
+    <div class="kpi"><div class="kpi-glow kpi-glow-cyan"></div>
+      <div class="kpi-label">Jun/25</div>
+      <div class="kpi-value" style="font-size:20px;color:var(--cyan)">R$132.000</div>
+      <div class="kpi-meta">Meta reduzida — Férias</div>
+      <span class="badge badge-cyan">Meta ajustada</span>
+    </div>
+    <div class="kpi"><div class="kpi-glow kpi-glow-green"></div>
+      <div class="kpi-label">Ago/25</div>
+      <div class="kpi-value grad-green" style="font-size:20px">R$197.999</div>
+      <div class="kpi-meta">+7% vs meta</div>
+      <span class="badge badge-green">✓ Superada</span>
+    </div>
+    <div class="kpi"><div class="kpi-glow kpi-glow-yellow"></div>
+      <div class="kpi-label">Jan/26</div>
+      <div class="kpi-value" style="font-size:20px;color:var(--yellow2)">R$157.757</div>
+      <div class="kpi-meta">98,6% da meta</div>
+      <span class="badge badge-yellow">Quase</span>
+    </div>
+    <div class="kpi"><div class="kpi-glow kpi-glow-red"></div>
+      <div class="kpi-label">Fev/26</div>
+      <div class="kpi-value grad-red" style="font-size:20px">R$139.368</div>
+      <div class="kpi-meta">84,5% da meta</div>
+      <span class="badge badge-red">Abaixo</span>
+    </div>
+  </div>
+
+  <div class="g2 mb16">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Faturamento Mensal — Série Histórica</div></div>
+      <div class="card-body"><div class="chart-wrap ch-300"><canvas id="chartHistFat"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Ticket Médio e Taxa de Conversão</div></div>
+      <div class="card-body"><div class="chart-wrap ch-300"><canvas id="chartHistTkConv"></canvas></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">Tabela Histórica Consolidada</div></div>
+    <div class="card-body ovx">
+      <table class="tbl">
+        <thead><tr>
+          <th>Mês</th><th>Faturamento</th><th>Meta</th><th>Alcance</th>
+          <th>Ticket Médio</th><th>Tx. Conversão</th><th>Orçamentos</th><th>Crescimento YoY</th><th>Status</th>
+        </tr></thead>
+        <tbody id="tbody-hist"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+</main>
+
+<!-- ============ MODALS ============ -->
+
+<!-- Modal Regras -->
+<div class="modal-overlay" id="modal-regras">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-regras')">✕</button>
+    <div class="modal-title">📋 Regras de Comissão — Programa Alta Performance</div>
+    <div style="margin-bottom:12px;font-size:12px;font-weight:700;color:var(--cyan)">BALCÃO</div>
+    <table class="tbl mb16">
+      <tr><th>Alcance</th><th>Comissão</th><th>Aplicação</th></tr>
+      <tr><td>Abaixo de 90%</td><td class="c-red">0,2%</td><td>Sobre total vendido</td></tr>
+      <tr><td>90% a 99,9%</td><td class="c-cyan">0,3%</td><td>Sobre total vendido</td></tr>
+      <tr><td>100% a 109,9%</td><td class="c-green">0,4%</td><td>Sobre total vendido</td></tr>
+      <tr><td>110% ou mais</td><td class="c-purple">0,6%</td><td>Sobre total vendido</td></tr>
+    </table>
+    <div style="margin-bottom:
+
