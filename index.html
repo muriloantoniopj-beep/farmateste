@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farmaformula Group — Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+:root{--bg:#04040a;--bg2:#08080f;--card:#0d0d18;--card2:#111120;--card3:#161628;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--cyan:#00e5ff;--cyan2:#00b4cc;--purple:#7c3aed;--purple2:#a855f7;--green:#10b981;--green2:#34d399;--yellow:#f59e0b;--yellow2:#fbbf24;--red:#ef4444;--red2:#f87171;--pink:#ec4899;--text:#f1f5f9;--text2:#94a3b8;--text3:#64748b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;top:-300px;left:-300px;width:700px;height:700px;background:radial-gradient(circle,rgba(124,58,237,0.07) 0%,transparent 70%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;bottom:-300px;right:-300px;width:700px;height:700px;background:radial-gradient(circle,rgba(0,229,255,0.05) 0%,transparent 70%);pointer-events:none;z-index:0}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:200;background:rgba(4,4,10,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.logo-wrap{display:flex;align-items:center;gap:12px}
+.logo-box{width:40px;height:40px;background:linear-gradient(135deg,var(--purple),var(--cyan));border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:#fff;box-shadow:0 0 20px rgba(124,58,237,0.4);flex-shrink:0}
+.logo-text h1{font-size:15px;font-weight:800;letter-spacing:2px}
+.logo-text span{font-size:9px;color:var(--text3);letter-spacing:1px}
+.hdr-nav{display:flex;gap:2px}
+.nav-btn{padding:6px 14px;border-radius:8px;border:none;background:none;color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;white-space:nowrap}
+.nav-btn:hover{background:rgba(255,255,255,0.06);color:var(--text)}
+.nav-btn.active{color:var(--cyan);background:rgba(0,229,255,0.08)}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.clock-box{background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);border-radius:8px;padding:5px 12px;font-family:monospace;font-size:12px;color:var(--cyan);font-weight:700}
+.spill{padding:5px 12px;border-radius:20px;border:1px solid var(--border2);background:none;color:var(--text2);font-size:10px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
+.spill:hover{border-color:var(--cyan);color:var(--cyan)}
+.spill.active{background:linear-gradient(135deg,var(--purple),var(--cyan));border-color:transparent;color:#fff}
+
+/* MAIN */
+.main{padding:24px;max-width:1800px;margin:0 auto;position:relative;z-index:1}
+
+/* TABS */
+.tab-content{display:none}.tab-content.active{display:block}
+
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:16px}
+.g6{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:16px}
+@media(max-width:1400px){.g6{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.g5{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:800px){.g2,.g3,.g4,.g5,.g6{grid-template-columns:1fr}.hdr-nav{display:none}}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color .3s}
+.card:hover{border-color:rgba(255,255,255,0.11)}
+.ch{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:gap}
+.ct{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.cs{font-size:10px;color:var(--text3);margin-top:2px}
+.cb{padding:18px}
+
+/* KPI */
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;position:relative;overflow:hidden;transition:all .3s}
+.kpi:hover{transform:translateY(-2px);border-color:rgba(255,255,255,0.11)}
+.kpi-glow{position:absolute;top:0;left:0;right:0;height:1px;border-radius:16px 16px 0 0}
+.gc{background:linear-gradient(90deg,transparent,var(--cyan),transparent)}
+.gp{background:linear-gradient(90deg,transparent,var(--purple2),transparent)}
+.gg{background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.gy{background:linear-gradient(90deg,transparent,var(--yellow),transparent)}
+.gr{background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.gpk{background:linear-gradient(90deg,transparent,var(--pink),transparent)}
+.kpi-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px}
+.kpi-value{font-size:22px;font-weight:800;margin-bottom:4px;line-height:1.1}
+.kpi-meta{font-size:10px;color:var(--text3);margin-bottom:8px}
+.kpi-bar{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.kpi-bar-fill{height:100%;border-radius:2px;transition:width 1s cubic-bezier(0.4,0,0.2,1)}
+.kpi-icon{position:absolute;right:16px;top:16px;font-size:20px;opacity:.12}
+
+/* BADGE */
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:9px;font-weight:700;border:1px solid}
+.bc{background:rgba(0,229,255,0.1);color:var(--cyan);border-color:rgba(0,229,255,0.2)}
+.bg{background:rgba(16,185,129,0.1);color:var(--green2);border-color:rgba(16,185,129,0.2)}
+.by{background:rgba(245,158,11,0.1);color:var(--yellow2);border-color:rgba(245,158,11,0.2)}
+.br{background:rgba(239,68,68,0.1);color:var(--red2);border-color:rgba(239,68,68,0.2)}
+.bp{background:rgba(124,58,237,0.1);color:var(--purple2);border-color:rgba(124,58,237,0.2)}
+.bpk{background:rgba(236,72,153,0.1);color:var(--pink);border-color:rgba(236,72,153,0.2)}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:11px}
+.tbl th{padding:9px 12px;text-align:left;background:rgba(255,255,255,0.03);color:var(--text3);font-size:9px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);font-weight:600}
+.tbl td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text2)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,255,255,0.02)}
+.tbl-total td{font-weight:800!important;color:var(--cyan)!important;background:rgba(0,229,255,0.04)!important}
+
+/* PROGRESS */
+.prog{height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;margin-top:3px}
+.prog-fill{height:100%;border-radius:3px;transition:width .8s}
+
+/* WEEK CARDS */
+.wgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.wcard{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:16px;position:relative;overflow:hidden}
+.wcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.w1::before{background:linear-gradient(90deg,var(--cyan),var(--purple2))}
+.w2::before{background:linear-gradient(90deg,var(--green),var(--cyan))}
+.w3::before{background:linear-gradient(90deg,var(--red),var(--yellow))}
+.w4::before{background:linear-gradient(90deg,var(--purple2),var(--pink))}
+.wlbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.wval{font-size:20px;font-weight:800;margin-bottom:2px}
+.wpct{font-size:11px;font-weight:700}
+
+/* VENDOR CARD */
+.vcard{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:16px;position:relative;overflow:hidden;transition:all .3s}
+.vcard:hover{border-color:rgba(255,255,255,0.13);transform:translateY(-2px)}
+.vcard-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.vname{font-size:13px;font-weight:700}
+.vloja{font-size:9px;color:var(--text3);margin-top:1px}
+.rank-b{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px}
+.r1{background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000;box-shadow:0 0 12px rgba(245,158,11,0.4)}
+.r2{background:linear-gradient(135deg,#94a3b8,#cbd5e1);color:#000}
+.r3{background:linear-gradient(135deg,#b45309,#d97706);color:#fff}
+.r4{background:rgba(255,255,255,0.1);color:var(--text3)}
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.vmetric .lbl{font-size:9px;color:var(--text3)}
+.vmetric .val{font-size:15px;font-weight:800}
+
+/* COMM BOX */
+.cbox{background:linear-gradient(135deg,rgba(124,58,237,0.07),rgba(0,229,255,0.07));border:1px solid rgba(124,58,237,0.18);border-radius:12px;padding:12px;margin-top:10px}
+.crow{display:flex;justify-content:space-between;padding:3px 0;font-size:10px;color:var(--text3)}
+.ctotal{font-size:16px;font-weight:900;background:linear-gradient(135deg,var(--purple2),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+/* FORM */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.fg input,.fg select,.fg textarea{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:9px 12px;color:var(--text);font-size:12px;font-family:'Inter',sans-serif;transition:all .2s;width:100%}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:rgba(0,229,255,0.4);background:rgba(0,229,255,0.03);box-shadow:0 0 0 3px rgba(0,229,255,0.06)}
+.fg input::placeholder{color:var(--text3)}
+.fg select option{background:#0d0d18;color:var(--text)}
+
+/* BUTTONS */
+.btn{padding:10px 22px;border-radius:9px;border:none;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:6px}
+.btn-cy{background:linear-gradient(135deg,var(--cyan2),var(--cyan));color:#000;box-shadow:0 4px 14px rgba(0,229,255,0.22)}
+.btn-cy:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,229,255,0.32)}
+.btn-pu{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;box-shadow:0 4px 14px rgba(124,58,237,0.22)}
+.btn-pu:hover{transform:translateY(-1px)}
+.btn-gh{background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text2)}
+.btn-gh:hover{background:rgba(255,255,255,0.08)}
+.btn-rd{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);color:var(--red2)}
+.btn-sm{padding:6px 12px;font-size:10px;border-radius:7px}
+
+/* ALERT */
+.alert{border-radius:10px;padding:10px 14px;font-size:11px;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.a-red{background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.18);color:var(--red2)}
+.a-yel{background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.18);color:var(--yellow2)}
+.a-grn{background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.18);color:var(--green2)}
+.a-cy{background:rgba(0,229,255,0.07);border:1px solid rgba(0,229,255,0.18);color:var(--cyan)}
+
+/* MISC */
+.sep{border:none;border-top:1px solid var(--border);margin:16px 0}
+.ovx{overflow-x:auto}
+.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}.mb24{margin-bottom:24px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
+.fw8{font-weight:800}
+.frow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.gc-text{background:linear-gradient(135deg,var(--cyan),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.gg-text{background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.gr-text{background:linear-gradient(135deg,var(--red),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.cy{color:var(--cyan)}.gn{color:var(--green2)}.rd{color:var(--red2)}.yl{color:var(--yellow2)}.pu{color:var(--purple2)}.pk{color:var(--pink)}
+.preview-box{background:linear-gradient(135deg,rgba(0,229,255,0.04),rgba(124,58,237,0.04));border:1px solid rgba(0,229,255,0.13);border-radius:13px;padding:14px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.pi .pl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+.pi .pv{font-size:17px;font-weight:800}
+.store-info{font-size:10px;color:var(--text3);display:flex;align-items:center;gap:6px}
+.sdot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.sd1{background:var(--cyan)}.sd2{background:var(--purple2)}.sd3{background:var(--green2)}
+.ind{width:5px;height:5px;border-radius:50%;display:inline-block;flex-shrink:0}
+.ig{background:var(--green2);box-shadow:0 0 5px var(--green)}
+.iy{background:var(--yellow2);box-shadow:0 0 5px var(--yellow)}
+.ir{background:var(--red2);box-shadow:0 0 5px var(--red)}
+
+/* CHART WRAPPER */
+.chw{position:relative}
+.ch200{height:200px}.ch250{height:250px}.ch280{height:280px}.ch300{height:300px}
+
+/* MODAL */
+.mov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(10px);z-index:500;align-items:center;justify-content:center}
+.mov.open{display:flex}
+.modal{background:var(--card2);border:1px solid var(--border2);border-radius:20px;padding:26px;width:92%;max-width:700px;max-height:90vh;overflow-y:auto;box-shadow:0 30px 70px rgba(0,0,0,0.6)}
+.modal-title{font-size:15px;font-weight:800;margin-bottom:18px}
+.mcl{float:right;background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;font-family:'Inter',sans-serif;line-height:1}
+.mcl:hover{color:var(--text)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 18px;border-radius:11px;font-weight:700;font-size:12px;z-index:999;display:none;animation:slu .3s ease;box-shadow:0 8px 30px rgba(0,0,0,0.4)}
+.ts{background:linear-gradient(135deg,var(--green),var(--green2));color:#000}
+.te{background:linear-gradient(135deg,var(--red),var(--red2));color:#fff}
+@keyframes slu{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* SECTION TITLE */
+.stitle{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.stitle h2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px}
+.stitle::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent)}
+.sicon{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px}
+
+/* DEF ROWS */
+.defrow{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.defrow:last-child{border-bottom:none}
+.defav{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0}
+.defname{font-size:11px;font-weight:700}
+.defsub{font-size:9px;color:var(--text3)}
+.defval{margin-left:auto;text-align:right}
+.defval .big{font-size:13px;font-weight:800;color:var(--red2)}
+.defval .sm{font-size:9px;color:var(--text3)}
+
+/* Store summary */
+.scard{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:16px}
+.scard-name{font-size:12px;font-weight:700;margin-bottom:12px}
+.smetric{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)}
+.smetric:last-child{border-bottom:none}
+.sm-lbl{font-size:10px;color:var(--text3)}
+.sm-val{font-size:12px;font-weight:700}
+
+/* HAT TRICK */
+.ht-badge{background:linear-gradient(135deg,var(--purple),var(--cyan));color:#fff;font-size:9px;padding:2px 7px;border-radius:10px;display:inline-block}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="logo-wrap">
+    <div class="logo-box">FF</div>
+    <div class="logo-text">
+      <h1>FARMAFORMULA GROUP</h1>
+      <span>SISTEMA DE DESEMPENHO COMERCIAL</span>
+    </div>
+  </div>
+  <nav class="hdr-nav">
+    <button class="nav-btn active" onclick="switchTab('dash',this)">📊 Dashboard</button>
+    <button class="nav-btn" onclick="switchTab('lancamento',this)">➕ Lançamento</button>
+    <button class="nav-btn" onclick="switchTab('vendedores',this)">👥 Vendedores</button>
+    <button class="nav-btn" onclick="switchTab('comissoes',this)">💰 Comissões</button>
+    <button class="nav-btn" onclick="switchTab('metas',this)">🎯 Metas</button>
+    <button class="nav-btn" onclick="switchTab('historico',this)">📈 Histórico</button>
+    <button class="nav-btn" onclick="switchTab('defasagem',this)">⚠️ Defasagem</button>
+  </nav>
+  <div class="hdr-right">
+    <div class="clock-box" id="clock">00:00:00</div>
+    <button class="spill active" onclick="filterStore('all',this)">🏢 Grupo</button>
+    <button class="spill" onclick="filterStore(1,this)">Cruz das Almas</button>
+    <button class="spill" onclick="filterStore(2,this)">Cachoeira</button>
+    <button class="spill" onclick="filterStore(3,this)">Valença</button>
+  </div>
+</header>
+
+<main class="main">
+
+<!-- ======== DASHBOARD ======== -->
+<div id="tab-dash" class="tab-content active">
+  <div id="alertas" class="mb16"></div>
+  <div class="g6 mb16" id="kpi-row"></div>
+  <div class="g2 mb16">
+    <div>
+      <div class="stitle"><div class="sicon" style="background:rgba(0,229,255,0.1)">📅</div><h2>Semanas — Cruz das Almas · Fev/26</h2></div>
+      <div class="wgrid" id="week-grid"></div>
+      <div class="stitle mt12"><div class="sicon" style="background:rgba(124,58,237,0.1)">🏪</div><h2>Resumo por Loja</h2></div>
+      <div class="g3 mb0" id="lojas-row"></div>
+    </div>
+    <div class="card">
+      <div class="ch"><div><div class="ct">Evolução do Faturamento</div><div class="cs">Mai/25 → Fev/26 · Sede Cruz das Almas</div></div><span class="badge bc">Histórico</span></div>
+      <div class="cb"><div class="chw ch300"><canvas id="chartEvol"></canvas></div></div>
+    </div>
+  </div>
+  <div class="stitle"><div class="sicon" style="background:rgba(16,185,129,0.1)">👥</div><h2>Desempenho dos Vendedores — Fev/26</h2></div>
+  <div class="g4 mb16" id="vcards-dash"></div>
+  <div class="g3 mb16">
+    <div class="card"><div class="ch"><div class="ct">Faturamento por Vendedor</div></div><div class="cb"><div class="chw ch200"><canvas id="chartFatV"></canvas></div></div></div>
+    <div class="card"><div class="ch"><div class="ct">Taxa de Conversão</div></div><div class="cb"><div class="chw ch200"><canvas id="chartConv"></canvas></div></div></div>
+    <div class="card"><div class="ch"><div class="ct">Ticket Médio por Vendedor</div></div><div class="cb"><div class="chw ch200"><canvas id="chartTick"></canvas></div></div></div>
+  </div>
+  <div class="g2 mb16">
+    <div class="card">
+      <div class="ch"><div><div class="ct">Ranking Geral</div><div class="cs">Fevereiro 2026</div></div><span class="badge bp">IEC Score</span></div>
+      <div class="cb ovx"><table class="tbl" id="tbl-ranking"></table></div>
+    </div>
+    <div class="card">
+      <div class="ch"><div><div class="ct">⚠️ Defasagem de Vendas</div><div class="cs">Orçamentos rejeitados · Fev/26</div></div><span class="badge br">R$ 43.402</span></div>
+      <div class="cb" id="def-panel"></div>
+    </div>
+  </div>
+  <div class="g3">
+    <div class="card"><div class="ch"><div class="ct">Mix de Produtos — Fev/26</div></div><div class="cb"><div class="chw ch200"><canvas id="chartMix"></canvas></div></div></div>
+    <div class="card"><div class="ch"><div class="ct">Cachoeira — Equipe</div><div class="cs">Jan/26 vs Fev/26</div></div><div class="cb"><div class="chw ch200"><canvas id="chartCach"></canvas></div></div></div>
+    <div class="card"><div class="ch"><div class="ct">Valença — Evolução</div><div class="cs">Jan/26 vs Fev/26</div></div><div class="cb"><div class="chw ch200"><canvas id="chartVal"></canvas></div></div></div>
+  </div>
+</div>
+
+<!-- ======== LANÇAMENTO ======== -->
+<div id="tab-lancamento" class="tab-content">
+  <div class="stitle"><div class="sicon" style="background:rgba(0,229,255,0.1)">➕</div><h2>Lançamento Diário de Vendas</h2></div>
+  <div class="g2 mb16">
+    <div class="card">
+      <div class="ch"><div><div class="ct">Novo Lançamento</div><div class="cs">Preencha os dados do vendedor no dia</div></div></div>
+      <div class="cb">
+        <div class="fgrid mb16">
+          <div class="fg"><label>Data</label><input type="date" id="l-data"></div>
+          <div class="fg"><label>Loja</label>
+            <select id="l-loja" onchange="updateVends()">
+              <option value="1">Cruz das Almas — Sede</option>
+              <option value="2">Cachoeira</option>
+              <option value="3">Valença</option>
+            </select>
+          </div>
+          <div class="fg"><label>Vendedor</label><select id="l-vend"></select></div>
+          <div class="fg"><label>Semana do Mês</label>
+            <select id="l-sem">
+              <option value="1">Semana 1</option><option value="2">Semana 2</option>
+              <option value="3">Semana 3</option><option value="4">Semana 4</option>
+            </select>
+          </div>
+        </div>
+        <hr class="sep">
+        <div class="fgrid mb16">
+          <div class="fg"><label>Valor Total Vendas (R$)</label><input type="number" id="l-valor" placeholder="0,00" step="0.01" min="0" oninput="calcPrev()"></div>
+          <div class="fg"><label>Valor Revenda (R$)</label><input type="number" id="l-rev" placeholder="0,00" step="0.01" oninput="calcPrev()"></div>
+          <div class="fg"><label>Clientes Atendidos</label><input type="number" id="l-cli" placeholder="0" oninput="calcPrev()"></div>
+          <div class="fg"><label>Orçamentos Gerados</label><input type="number" id="l-orc" placeholder="0" oninput="calcPrev()"></div>
+          <div class="fg"><label>Orçamentos Rejeitados</label><input type="number" id="l-rej" placeholder="0" oninput="calcPrev()"></div>
+          <div class="fg"><label>Valor Rejeitado (R$)</label><input type="number" id="l-vrej" placeholder="0,00" step="0.01"></div>
+          <div class="fg"><label>Fórmulas Alopatia</label><input type="number" id="l-alf" placeholder="0"></div>
+          <div class="fg"><label>Vendas Alopatia</label><input type="number" id="l-alv" placeholder="0"></div>
+          <div class="fg"><label>Fórmulas Homeopático</label><input type="number" id="l-hof" placeholder="0"></div>
+          <div class="fg"><label>Vendas Homeopático</label><input type="number" id="l-hov" placeholder="0"></div>
+          <div class="fg"><label>Desconto Concedido (R$)</label><input type="number" id="l-desc" placeholder="0,00" step="0.01"></div>
+          <div class="fg"><label>Observação</label><input type="text" id="l-obs" placeholder="Opcional"></div>
+        </div>
+        <div id="l-prev" class="mb16"></div>
+        <div class="frow">
+          <button class="btn btn-cy" onclick="salvarLanc()">💾 Salvar Lançamento</button>
+          <button class="btn btn-gh" onclick="limparLanc()">🗑 Limpar</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch">
+        <div><div class="ct">Lançamentos Registrados</div></div>
+        <div class="frow">
+          <input type="date" id="f-data" onchange="renderLancs()" style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;padding:5px 10px;color:var(--text);font-size:10px;font-family:'Inter',sans-serif">
+          <select id="f-loja" onchange="renderLancs()" style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;padding:5px 10px;color:var(--text);font-size:10px;font-family:'Inter',sans-serif">
+            <option value="">Todas as Lojas</option>
+            <option value="1">Cruz das Almas</option>
+            <option value="2">Cachoeira</option>
+            <option value="3">Valença</option>
+          </select>
+          <button class="btn btn-gh btn-sm" onclick="clearFilters()">✕ Limpar</button>
+        </div>
+      </div>
+      <div class="cb">
+        <div class="ovx">
+          <table class="tbl">
+            <thead><tr><th>Data</th><th>Loja</th><th>Vendedor</th><th>Valor</th><th>Clientes</th><th>Orçamentos</th><th>Ticket</th><th>Conversão</th><th>Ação</th></tr></thead>
+            <tbody id="tbody-lancs"><tr><td colspan="9" style="text-align:center;padding:28px;color:var(--text3)">Nenhum lançamento ainda.</td></tr></tbody>
+          </table>
+        </div>
+        <div id="totais-dia" class="mt16"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== VENDEDORES ======== -->
+<div id="tab-vendedores" class="tab-content">
+  <div class="stitle"><div class="sicon" style="background:rgba(16,185,129,0.1)">👤</div><h2>Perfil Detalhado dos Vendedores</h2></div>
+  <div class="frow mb20">
+    <button class="btn btn-cy btn-sm" onclick="filterVend('todos',this)">Todos</button>
+    <button class="btn btn-gh btn-sm" onclick="filterVend(1,this)">Cruz das Almas</button>
+    <button class="btn btn-gh btn-sm" onclick="filterVend(2,this)">Cachoeira</button>
+    <button class="btn btn-gh btn-sm" onclick="filterVend(3,this)">Valença</button>
+  </div>
+  <div class="g4 mb20" id="vcards-vend"></div>
+  <div class="card mb16">
+    <div class="ch"><div><div class="ct">Análise Comparativa — Fevereiro 2026</div></div></div>
+    <div class="cb ovx"><table class="tbl" id="tbl-vend"></table></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ch"><div class="ct">Comparativo Jan × Fev — Faturamento</div></div><div class="cb"><div class="chw ch250"><canvas id="chartJanFev"></canvas></div></div></div>
+    <div class="card"><div class="ch"><div class="ct">Indicadores Jan × Fev</div></div><div class="cb"><div class="chw ch250"><canvas id="chartIndic"></canvas></div></div></div>
+  </div>
+</div>
+
+<!-- ======== COMISSÕES ======== -->
+<div id="tab-comissoes" class="tab-content">
+  <div class="stitle"><div class="sicon" style="background:rgba(245,158,11,0.1)">💰</div><h2>Cálculo de Comissões e Bonificações</h2></div>
+  <div class="card mb16">
+    <div class="ch"><div><div class="ct">Tabela de Comissões Vigentes</div><div class="cs">Programa Alta Performance · Set/25</div></div><button class="btn btn-gh btn-sm" onclick="openModal('modal-regras')">📋 Regras Completas</button></div>
+    <div class="cb">
+      <div class="g4">
+        <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.18);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Abaixo de 90%</div>
+          <div style="font-size:26px;font-weight:900;color:var(--red2)">0,2%</div>
+          <div style="font-size:9px;color:var(--text3);margin-top:6px">Sobre total vendido</div>
+        </div>
+        <div style="background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.18);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">90% a 99,9%</div>
+          <div style="font-size:26px;font-weight:900;color:var(--cyan)">0,3%</div>
+          <div style="font-size:9px;color:var(--text3);margin-top:6px">Sobre total vendido</div>
+        </div>
+        <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.18);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">100% a 109,9%</div>
+          <div style="font-size:26px;font-weight:900;color:var(--green2)">0,4%</div>
+          <div style="font-size:9px;color:var(--text3);margin-top:6px">Sobre total vendido</div>
+        </div>
+        <div style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.18);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">110% ou mais</div>
+          <div style="font-size:26px;font-weight:900;color:var(--purple2)">0,6%</div>
+          <div style="font-size:9px;color:var(--text3);margin-top:6px">Sobre total vendido</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="frow mb16">
+    <div class="fg" style="min-width:180px"><label>Período</label>
+      <select id="com-per" onchange="renderComm()">
+        <option value="fev26">Fevereiro 2026</option>
+        <option value="jan26">Janeiro 2026</option>
+      </select>
+    </div>
+    <div class="fg" style="min-width:180px"><label>Loja</label>
+      <select id="com-loja" onchange="renderComm()">
+        <option value="1">Cruz das Almas</option>
+        <option value="2">Cachoeira</option>
+        <option value="3">Valença</option>
+      </select>
+    </div>
+  </div>
+  <div class="g4 mb16" id="comm-cards"></div>
+  <div class="card mb16">
+    <div class="ch"><div class="ct">Resumo de Pagamentos</div></div>
+    <div class="cb ovx"><table class="tbl" id="tbl-comm"></table></div>
+  </div>
+  <div class="card">
+    <div class="ch"><div><div class="ct">🧮 Simulador de Comissão</div><div class="cs">Calcule cenários em tempo real</div></div></div>
+    <div class="cb">
+      <div class="fgrid mb16">
+        <div class="fg"><label>Vendedor</label>
+          <select id="s-vend">
+            <option value="JAILDA">Jailda</option><option value="THAINA">Thaina</option>
+            <option value="DIRLENE">Dirlene</option><option value="TARCIZIO">Tarcizio</option>
+            <option value="DAVID">David</option><option value="JACKSON">Jackson</option>
+            <option value="BRUNA">Bruna Bahia</option><option value="STEFANE">Stefane</option>
+            <option value="JESSIKA">Jessika</option>
+          </select>
+        </div>
+        <div class="fg"><label>Meta Individual (R$)</label><input type="number" id="s-meta" value="55253" oninput="simComm()"></div>
+        <div class="fg"><label>Faturamento Realizado (R$)</label><input type="number" id="s-fat" value="44576" oninput="simComm()"></div>
+        <div class="fg"><label>Semanas com bônus alcançado</label><input type="number" id="s-sem" value="2" min="0" max="4" oninput="simComm()"></div>
+        <div class="fg"><label>Hat Tricks (semanas)</label><input type="number" id="s-hat" value="0" min="0" max="4" oninput="simComm()"></div>
+        <div class="fg"><label>Canal</label>
+          <select id="s-canal" onchange="simComm()">
+            <option value="balcao">Balcão</option>
+            <option value="tele">Teleformula</option>
+          </select>
+        </div>
+        <div class="fg"><label>Alcançou conversão ≥ 85%?</label>
+          <select id="s-conv" onchange="simComm()">
+            <option value="0">Não</option><option value="1">Sim</option>
+          </select>
+        </div>
+        <div class="fg"><label>Alcançou ticket ≥ R$160?</label>
+          <select id="s-tick" onchange="simComm()">
+            <option value="0">Não</option><option value="1">Sim</option>
+          </select>
+        </div>
+      </div>
+      <div id="sim-res"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== METAS ======== -->
+<div id="tab-metas" class="tab-content">
+  <div class="stitle"><div class="sicon" style="background:rgba(245,158,11,0.1)">🎯</div><h2>Gestão de Metas</h2></div>
+  <div class="g2 mb16">
+    <div class="card">
+      <div class="ch"><div><div class="ct">Metas Globais por Loja</div><div class="cs">Configuração mensal</div></div><button class="btn btn-cy btn-sm" onclick="openModal('modal-metas')">✏️ Editar Metas</button></div>
+      <div class="cb"><table class="tbl" id="tbl-metas-loja"></table></div>
+    </div>
+    <div class="card"><div class="ch"><div class="ct">Distribuição da Meta — Cruz das Almas</div></div><div class="cb"><div class="chw ch250"><canvas id="chartMetaDist"></canvas></div></div></div>
+  </div>
+  <div class="card mb16">
+    <div class="ch"><div class="ct">Metas Semanais — Cruz das Almas</div></div>
+    <div class="cb"><div class="wgrid" id="metas-sem"></div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct">Metas Individuais por Vendedor</div></div>
+    <div class="cb ovx"><table class="tbl" id="tbl-metas-ind"></table></div>
+  </div>
+</div>
+
+<!-- ======== HISTÓRICO ======== -->
+<div id="tab-historico" class="tab-content">
+  <div class="stitle"><div class="sicon" style="background:rgba(236,72,153,0.1)">📈</div><h2>Histórico e Tendências</h2></div>
+  <div class="g5 mb16">
+    <div class="kpi"><div class="kpi-glow gp"></div><div class="kpi-label">Mai/25</div><div class="kpi-value gc-text" style="font-size:18px">R$184.837</div><div class="kpi-meta">+15,5% vs meta</div><span class="badge bg">✓ Superada</span></div>
+    <div class="kpi"><div class="kpi-glow gc"></div><div class="kpi-label">Jun/25</div><div class="kpi-value cy" style="font-size:18px">R$132.000</div><div class="kpi-meta">Meta reduzida — Férias</div><span class="badge bc">Ajustada</span></div>
+    <div class="kpi"><div class="kpi-glow gg"></div><div class="kpi-label">Ago/25</div><div class="kpi-value gg-text" style="font-size:18px">R$197.999</div><div class="kpi-meta">+7% vs meta</div><span class="badge bg">✓ Superada</span></div>
+    <div class="kpi"><div class="kpi-glow gy"></div><div class="kpi-label">Jan/26</div><div class="kpi-value yl" style="font-size:18px">R$157.757</div><div class="kpi-meta">98,6% da meta</div><span class="badge by">Quase</span></div>
+    <div class="kpi"><div class="kpi-glow gr"></div><div class="kpi-label">Fev/26</div><div class="kpi-value gr-text" style="font-size:18px">R$139.368</div><div class="kpi-meta">84,5% da meta</div><span class="badge br">Abaixo</span></div>
+  </div>
+  <div class="g2 mb16">
+    <div class="card"><div class="ch"><div class="ct">Faturamento Mensal — Série Histórica</div></div><div class="cb"><div class="chw ch300"><canvas id="chartHFat"></canvas></div></div></div>
+    <div class="card"><div class="ch"><div class="ct">Ticket Médio e Taxa de Conversão</div></div><div class="cb"><div class="chw ch300"><canvas id="chartHTkC"></canvas></div></div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct">Tabela Histórica Consolidada</div></div>
+    <div class="cb ovx">
+      <table class="tbl">
+        <thead><tr><th>Mês</th><th>Faturamento</th><th>Meta</th><th>Alcance</th><th>Ticket Médio</th><th>Tx. Conversão</th><th>Orçamentos</th><th>Crescimento YoY</th><th>Status</th></tr></thead>
+        <tbody id="tbody-hist"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ======== DEFASAGEM ======== -->
+<div id="tab-defasagem" class="tab-content">
+  <div class="stitle"><div class="sicon" style="background:rgba(239,68,68,0.1)">⚠️</div><h2>Defasagem de Vendas</h2></div>
+  <div class="g4 mb16">
+    <div class="kpi"><div class="kpi-glow gr"></div><div class="kpi-icon">💸</div><div class="kpi-label">Total Rejeitado Fev/26</div><div class="kpi-value rd">R$ 43.402</div><div class="kpi-meta">143 orçamentos perdidos</div></div>
+    <div class="kpi"><div class="kpi-glow gy"></div><div class="kpi-icon">🎯</div><div class="kpi-label">Ticket Médio Perdido</div><div class="kpi-value yl">R$ 303,51</div><div class="kpi-meta">por orçamento rejeitado</div></div>
+    <div class="kpi"><div class="kpi-glow gr"></div><div class="kpi-icon">📉</div><div class="kpi-label">% do Fat. Perdido</div><div class="kpi-value rd">31,1%</div><div class="kpi-meta">em relação ao realizado</div></div>
+    <div class="kpi"><div class="kpi-glow gy"></div><div class="kpi-icon">🔴</div><div class="kpi-label">Maior Defasagem</div><div class="kpi-value yl" style="font-size:18px">Tarcizio</div><div class="kpi-meta">R$ 14.566 · 34 rejeitados</div></div>
+  </div>
+  <div class="g2 mb16">
+    <div class="card"><div class="ch"><div class="ct">Defasagem por Vendedor — Fev/26</div></div><div class="cb"><div class="chw ch250"><canvas id="chartDef"></canvas></div></div></div>
+    <div class="card"><div class="ch"><div class="ct">Histórico de Defasagem</div></div><div class="cb"><div class="chw ch250"><canvas id="chartDefH"></canvas></div></div></div>
+  </div>
+  <div class="card mb16">
+    <div class="ch"><div class="ct">Detalhamento — Orçamentos Perdidos · Fev/26</div></div>
+    <div class="cb ovx">
+      <table class="tbl">
+        <thead><tr><th>Vendedor</th><th>Orçamentos Perdidos</th><th>Valor Rejeitado</th><th>Ticket Médio Perdido</th><th>% do Total</th><th>Impacto no Resultado</th><th>Status</th></tr></thead>
+        <tbody id="tbody-def"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><div><div class="ct">Registrar Orçamento Rejeitado</div><div class="cs">Adicione manualmente defasagens do dia</div></div></div>
+    <div class="cb">
+      <div class="fgrid mb16">
+        <div class="fg"><label>Data</label><input type="date" id="d-data"></div>
+        <div class="fg"><label>Vendedor</label>
+          <select id="d-vend">
+            <option value="JAILDA">Jailda — Cruz das Almas</option>
+            <option value="THAINA">Thaina — Cruz das Almas</option>
+            <option value="DIRLENE">Dirlene — Cruz das Almas</option>
+            <option value="TARCIZIO">Tarcizio — Cruz das Almas</option>
+            <option value="DAVID">David — Cachoeira</option>
+            <option value="JACKSON">Jackson — Cachoeira</option>
+            <option value="BRUNA">Bruna Bahia — Cachoeira</option>
+            <option value="STEFANE">Stefane — Valença</option>
+            <option value="JESSIKA">Jessika — Valença</option>
+          </select>
+        </div>
+        <div class="fg"><label>Qtd. Orçamentos Rejeitados</label><input type="number" id="d-qtd" placeholder="0"></div>
+        <div class="fg"><label>Valor Total Rejeitado (R$)</label><input type="number" id="d-valor" placeholder="0,00" step="0.01"></div>
+        <div class="fg"><label>Motivo</label>
+          <select id="d-motivo">
+            <option>Preço alto</option><option>Cliente não retornou</option>
+            <option>Falta de produto</option><option>Prazo de entrega</option>
+            <option>Concorrência</option><option>Outro</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-cy" onclick="salvarDef()">💾 Registrar Defasagem</button>
+      <div class="mt16 ovx"><table class="tbl" id="tbl-def-reg"><thead><tr><th>Data</th><th>Vendedor</th><th>Qtd.</th><th>Valor</th><th>Motivo</th><th>Ação</th></tr></thead><tbody id="tbody-def-reg"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">Nenhum registro.</td></tr></tbody></table></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- MODAL REGRAS -->
+<div class="mov" id="modal-regras">
+  <div class="modal">
+    <button class="mcl" onclick="closeModal('modal-regras')">✕</button>
+    <div class="modal-title">📋 Regras de Comissão — Programa Alta Performance</div>
+    <div style="font-size:11px;font-weight:700;color:var(--cyan);margin-bottom:8px">BALCÃO</div>
+    <table class="tbl mb16">
+      <tr><th>Alcance</th><th>Comissão</th><th>Aplicação</th></tr>
+      <tr><td>Abaixo de 90%</td><td class="rd">0,2%</td><td>Sobre total vendido</td></tr>
+      <tr><td>90% a 99,9%</td><td class="cy">0,3%</td><td>Sobre total vendido</td></tr>
+      <tr><td>100% a 109,9%</td><td class="gn">0,4%</td><td>Sobre total vendido</td></tr>
+      <tr><td>110% ou mais</td><td class="pu">0,6%</td><td>Sobre total vendido</td></tr>
+    </table>
+    <div style="font-size:11px;font-weight:700;color:var(--purple2);margin-bottom:8px">TELEFORMULA</div>
+    <table class="tbl mb16">
+      <tr><th>Alcance</th><th>Comissão</th></tr>
+      <tr><td>90% a 99,9%</td><td class="cy">0,5%</td></tr>
+      <tr><td>100% a 109,9%</td><td class="gn">0,7%</td></tr>
+      <tr><td>110% ou mais</td><td class="pu">1,0%</td></tr>
+    </table>
+    <div style="font-size:11px;font-weight:700;margin-bottom:8px">BÔNUS SEMANAIS — Cruz das Almas (Fev/26)</div>
+    <table class="tbl mb16">
+      <tr><th>Semana</th><th>Critério</th><th>Valor</th></tr>
+      <tr><td>Semana 1</td><td>30% da meta global</td><td class="gn fw8">R$ 170,00</td></tr>
+      <tr><td>Semana 2</td><td>25% da meta global</td><td class="gn fw8">R$ 160,00</td></tr>
+      <tr><td>Semana 3</td><td>25% da meta global</td><td class="gn fw8">R$ 150,00</td></tr>
+      <tr><td>Semana 4</td><td>20% da meta global</td><td class="gn fw8">R$ 150,00</td></tr>
+    </table>
+    <div class="alert a-cy" style="margin-bottom:8px">🎩 <span><strong>Hat Trick Semanal:</strong> Atingir Faturamento + Ticket Médio + Taxa de Conversão na mesma semana = +50% sobre o bônus da semana.</span></div>
+    <div class="alert a-grn">✅ <span><strong>Bônus Mensais:</strong> Conversão ≥ 85% = R$ 50,00 | Ticket Médio ≥ R$ 160
+
