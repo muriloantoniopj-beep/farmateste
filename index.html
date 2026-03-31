@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador Abril 2026 — Farmaformula</title>
+<style>
+:root {
+  --primary: #1a237e;
+  --secondary: #283593;
+  --accent: #42a5f5;
+  --success: #2e7d32;
+  --warning: #f57f17;
+  --danger: #c62828;
+  --bg: #f0f4f8;
+  --card: #ffffff;
+  --text: #212121;
+  --muted: #616161;
+  --border: #e0e0e0;
+  --green-light: #e8f5e9;
+  --red-light: #ffebee;
+  --yellow-light: #fffde7;
+  --blue-light: #e3f2fd;
+  --purple: #6a1b9a;
+  --purple-light: #f3e5f5;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* HEADER */
+header {
+  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+  color: white;
+  position: sticky; top: 0; z-index: 200;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.header-top {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+.header-brand { display: flex; align-items: center; gap: 12px; }
+.header-logo {
+  width: 44px; height: 44px; background: white; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; font-size: 22px;
+}
+.header-title h1 { font-size: 1.25rem; font-weight: 800; }
+.header-title p { font-size: 0.76rem; opacity: 0.8; margin-top: 2px; }
+.header-pills { display: flex; gap: 12px; }
+.pill {
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 20px; padding: 6px 14px; font-size: 0.78rem; text-align: center;
+}
+.pill strong { display: block; font-size: 0.95rem; font-weight: 800; }
+.nav-tabs { display: flex; gap: 0; padding: 0 24px; overflow-x: auto; }
+.tab {
+  padding: 10px 18px; cursor: pointer; font-size: 0.8rem; font-weight: 600;
+  color: rgba(255,255,255,0.65); border-bottom: 3px solid transparent;
+  transition: all 0.2s; white-space: nowrap; user-select: none;
+}
+.tab:hover { color: white; background: rgba(255,255,255,0.07); }
+.tab.active { color: white; border-bottom-color: #42a5f5; }
+
+/* LAYOUT */
+.container { max-width: 1600px; margin: 0 auto; padding: 24px; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* CARDS */
+.card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; }
+.card-header {
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(to right, #fafafa, white);
+}
+.card-header h3 { font-size: 0.9rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+.card-body { padding: 20px; }
+
+/* GRID */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+.g5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 16px; }
+.mb16 { margin-bottom: 16px; }
+.mb20 { margin-bottom: 20px; }
+.mb24 { margin-bottom: 24px; }
+.mt16 { margin-top: 16px; }
+.mt20 { margin-top: 20px; }
+
+@media(max-width:1200px){ .g4{grid-template-columns:1fr 1fr;} .g5{grid-template-columns:repeat(3,1fr);} }
+@media(max-width:768px){ .g2,.g3,.g4,.g5{grid-template-columns:1fr;} .header-pills{display:none;} }
+
+/* KPI */
+.kpi {
+  background: white; border-radius: 12px; padding: 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid var(--accent);
+  position: relative; overflow: hidden;
+}
+.kpi::after { content:''; position:absolute; top:-20px; right:-20px; width:80px; height:80px; border-radius:50%; opacity:0.06; background: var(--accent); }
+.kpi.g  { border-left-color:#2e7d32; } .kpi.g::after  { background:#2e7d32; }
+.kpi.o  { border-left-color:#e65100; } .kpi.o::after  { background:#e65100; }
+.kpi.p  { border-left-color:#6a1b9a; } .kpi.p::after  { background:#6a1b9a; }
+.kpi.r  { border-left-color:#c62828; } .kpi.r::after  { background:#c62828; }
+.kpi.y  { border-left-color:#f57f17; } .kpi.y::after  { background:#f57f17; }
+.kpi-lbl { font-size:0.71rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+.kpi-val { font-size:1.55rem; font-weight:800; color:var(--text); margin:4px 0; }
+.kpi-sub { font-size:0.76rem; color:var(--muted); }
+.kpi-ico { font-size:1.7rem; position:absolute; right:16px; top:16px; opacity:0.35; }
+
+/* PROGRESS */
+.pb-wrap { margin-top:8px; }
+.pb-bg { background:var(--border); border-radius:8px; height:8px; overflow:hidden; }
+.pb-fill { height:100%; border-radius:8px; transition: width .5s ease; }
+.pb-lbl { display:flex; justify-content:space-between; font-size:0.7rem; color:var(--muted); margin-top:3px; }
+
+/* SECTION TITLE */
+.stitle {
+  font-size:1rem; font-weight:800; color:var(--primary);
+  margin-bottom:16px; padding-bottom:8px;
+  border-bottom:2px solid var(--accent);
+  display:flex; align-items:center; gap:8px;
+}
+
+/* TABLES */
+.tbl-wrap { overflow-x: auto; }
+table { width:100%; border-collapse:collapse; font-size:0.83rem; }
+th { background:var(--primary); color:white; padding:10px 12px; text-align:left; font-weight:600; font-size:0.77rem; white-space:nowrap; }
+td { padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:middle; }
+tr:hover td { background:#f5f9ff; }
+tr:last-child td { border-bottom:none; }
+.tr-total td { background:#e8eaf6 !important; font-weight:800; color:var(--primary); }
+
+/* BADGE */
+.badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.71rem; font-weight:700; }
+.bg { background:var(--green-light); color:#1b5e20; }
+.br { background:var(--red-light); color:#b71c1c; }
+.by { background:var(--yellow-light); color:#e65100; }
+.bb { background:var(--blue-light); color:#0d47a1; }
+.bp { background:var(--purple-light); color:#4a148c; }
+
+/* ALERT */
+.alert { border-radius:8px; padding:12px 16px; font-size:0.82rem; margin-bottom:16px; display:flex; align-items:flex-start; gap:10px; }
+.ai { background:var(--blue-light); color:#0d47a1; border-left:4px solid var(--accent); }
+.as { background:var(--green-light); color:#1b5e20; border-left:4px solid #2e7d32; }
+.aw { background:var(--yellow-light); color:#e65100; border-left:4px solid #ff9800; }
+.ad { background:var(--red-light); color:#b71c1c; border-left:4px solid #c62828; }
+
+/* STORE HEADER */
+.store-hdr {
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  color:white; border-radius:12px; padding:16px 20px; margin-bottom:20px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.store-hdr h2 { font-size:1.1rem; font-weight:800; }
+.store-hdr p { font-size:0.78rem; opacity:0.8; margin-top:2px; }
+.store-hdr .badges { display:flex; gap:8px; flex-wrap:wrap; }
+.store-badge { background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); border-radius:16px; padding:5px 12px; font-size:0.75rem; }
+
+/* EMP CARD */
+.emp-card { background:white; border-radius:12px; padding:18px; box-shadow:0 2px 8px rgba(0,0,0,0.08); border-top:4px solid var(--accent); }
+.emp-card.c1{border-top-color:#e91e63;} .emp-card.c2{border-top-color:#9c27b0;} .emp-card.c3{border-top-color:#ff9800;}
+.emp-card.c4{border-top-color:#4caf50;} .emp-card.c5{border-top-color:#2196f3;} .emp-card.c6{border-top-color:#009688;}
+.emp-card.c7{border-top-color:#ff5722;} .emp-card.c8{border-top-color:#00897b;} .emp-card.c9{border-top-color:#5c6bc0;}
+.emp-avatar { width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:800; color:white; margin-bottom:10px; }
+.emp-name { font-size:0.9rem; font-weight:800; }
+.emp-role { font-size:0.71rem; color:var(--muted); }
+.emp-store { font-size:0.69rem; color:var(--accent); font-weight:700; margin-top:2px; }
+.emp-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+.emp-stat { background:var(--bg); border-radius:8px; padding:8px; text-align:center; }
+.emp-stat-v { font-size:0.95rem; font-weight:800; color:var(--primary); }
+.emp-stat-l { font-size:0.63rem; color:var(--muted); }
+
+/* RANKING */
+.rank-item { display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid var(--border); }
+.rank-item:last-child { border-bottom:none; }
+.rank-pos { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.78rem; font-weight:800; flex-shrink:0; }
+.rp1{background:#ffd700;color:#5d4037;} .rp2{background:#c0c0c0;color:#37474f;} .rp3{background:#cd7f32;color:white;} .rp4{background:var(--bg);color:var(--muted);}
+.rank-info { flex:1; }
+.rank-name { font-size:0.84rem; font-weight:700; }
+.rank-store { font-size:0.7rem; color:var(--muted); }
+.rank-val { text-align:right; }
+.rank-amt { font-size:0.92rem; font-weight:800; color:var(--primary); }
+
+/* BAR CHART */
+.bar-chart { display:flex; align-items:flex-end; gap:8px; padding:0 4px; }
+.bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.bar-fill { width:100%; border-radius:6px 6px 0 0; }
+.bar-lbl { font-size:0.63rem; color:var(--muted); text-align:center; font-weight:600; }
+.bar-val { font-size:0.62rem; color:var(--muted); }
+
+/* WEEK SUMMARY */
+.week-row { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:20px; }
+.wk { background:white; border-radius:10px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,0.07); text-align:center; border-top:3px solid var(--accent); }
+.wk.w1{border-top-color:#42a5f5;} .wk.w2{border-top-color:#66bb6a;} .wk.w3{border-top-color:#ffa726;} .wk.w4{border-top-color:#ef5350;} .wk.wt{border-top-color:var(--primary);}
+.wk-lbl { font-size:0.68rem; color:var(--muted); font-weight:700; text-transform:uppercase; }
+.wk-sub { font-size:0.62rem; color:var(--muted); font-weight:400; }
+.wk-val { font-size:1.1rem; font-weight:800; color:var(--primary); margin:4px 0; }
+.spark { display:flex; gap:2px; align-items:flex-end; height:26px; margin-top:6px; }
+.sp { flex:1; border-radius:2px 2px 0 0; }
+
+/* DOT */
+.dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px; }
+.ds{background:var(--primary);} .dc{background:#ff9800;} .dv{background:#4caf50;}
+
+/* CALENDAR */
+.cal-legend { display:flex; gap:16px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+.cal-legend-item { display:flex; align-items:center; gap:5px; font-size:0.73rem; color:var(--muted); }
+.leg-box { width:14px; height:14px; border-radius:3px; border:1px solid #ccc; }
+.cal-wrap { background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08); overflow:hidden; }
+.cal-title { background:var(--primary); color:white; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; }
+.cal-title h3 { font-size:1rem; font-weight:800; }
+.cal-title span { font-size:0.8rem; opacity:0.8; }
+.cal-days-header { display:grid; grid-template-columns:repeat(7,1fr); background:#e8eaf6; }
+.cal-dh { padding:8px 4px; text-align:center; font-size:0.71rem; font-weight:800; color:var(--primary); text-transform:uppercase; }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; padding:4px; background:#e8eaf6; }
+.cal-cell {
+  background:white; border-radius:6px; padding:6px 5px; min-height:95px; cursor:pointer;
+  transition: all .15s; position:relative; border:2px solid transparent;
+}
+.cal-cell:hover { border-color:var(--accent); box-shadow:0 2px 8px rgba(66,165,245,0.25); z-index:1; }
+.cal-cell.empty { background:#f5f5f5; cursor:default; min-height:95px; }
+.cal-cell.empty:hover { border-color:transparent; box-shadow:none; }
+.cal-cell.sunday { background:#fff8f8; }
+.cal-cell.holiday { background:#fff3cd; }
+.cal-cell.over { background:#e8f5e9; border-color:#a5d6a7; }
+.cal-cell.under { background:#ffebee; border-color:#ef9a9a; }
+.cal-cell.partial { background:#fff8e1; border-color:#ffe082; }
+.cal-cell.selected { border-color:var(--primary) !important; box-shadow:0 0 0 2px rgba(26,35,126,0.3); }
+.c-day { font-size:0.72rem; font-weight:800; color:var(--muted); }
+.c-day.sun { color:#c62828; }
+.c-total { font-size:0.8rem; font-weight:800; color:var(--primary); margin-top:2px; }
+.c-holiday-lbl { font-size:0.6rem; background:#ff9800; color:white; border-radius:3px; padding:1px 4px; display:inline-block; margin-top:1px; }
+.c-sellers { margin-top:3px; display:flex; flex-direction:column; gap:1px; }
+.c-s { display:flex; justify-content:space-between; font-size:0.61rem; }
+.c-sn { font-weight:700; color:var(--muted); }
+.c-sv { color:var(--primary); }
+.c-meta { font-size:0.6rem; color:var(--muted); margin-top:2px; display:flex; gap:4px; flex-wrap:wrap; }
+.c-tag { background:#e3f2fd; color:#0d47a1; border-radius:3px; padding:1px 4px; font-size:0.58rem; font-weight:700; }
+.c-tag.ok { background:#e8f5e9; color:#1b5e20; }
+.c-tag.no { background:#ffebee; color:#b71c1c; }
+
+/* FILTER BAR */
+.filter-bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; background:white; padding:10px 14px; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.06); margin-bottom:20px; }
+.fl { font-size:0.76rem; font-weight:700; color:var(--muted); }
+.fbtn { padding:5px 13px; border:1.5px solid var(--border); border-radius:20px; cursor:pointer; font-size:0.76rem; font-weight:600; background:white; color:var(--muted); transition:all .2s; }
+.fbtn:hover,.fbtn.active { background:var(--primary); color:white; border-color:var(--primary); }
+
+/* MODAL */
+.modal-ov { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:999; align-items:center; justify-content:center; }
+.modal-ov.open { display:flex; }
+.modal { background:white; border-radius:16px; padding:28px; max-width:720px; width:95%; max-height:88vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3); position:relative; }
+.modal-close { position:absolute; top:14px; right:14px; background:var(--bg); border:none; border-radius:50%; width:32px; height:32px; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+.modal-title { font-size:1.1rem; font-weight:800; color:var(--primary); margin-bottom:16px; }
+
+/* BONUS */
+.bonus-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:0.83rem; }
+.bonus-row:last-child { border-bottom:none; font-weight:800; color:var(--primary); }
+.bonus-section { background:var(--bg); border-radius:10px; padding:14px; margin-bottom:14px; }
+.bonus-section h4 { font-size:0.8rem; font-weight:800; color:var(--primary); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+
+/* TOOLTIP */
+[data-tip] { position:relative; cursor:help; }
+[data-tip]::after { content:attr(data-tip); position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%); background:#333; color:white; padding:5px 10px; border-radius:6px; font-size:0.71rem; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .2s; z-index:10; }
+[data-tip]:hover::after { opacity:1; }
+
+.tr { text-align:right; }
+.tc { text-align:center; }
+.fw8 { font-weight:800; }
+.fc-g { color:var(--success); } .fc-r { color:var(--danger); } .fc-y { color:var(--warning); }
+.fs-sm { font-size:0.77rem; }
+html { scroll-behavior:smooth; }
+
+/* META PILL TABLE */
+.meta-cell { display:flex; align-items:center; gap:6px; }
+.mini-pb { flex:1; background:var(--border); border-radius:4px; height:5px; overflow:hidden; }
+.mini-pb-f { height:100%; border-radius:4px; }
+</style>
+</head>
+<body>
+
+<!-- MODAL DIA -->
+<div class="modal-ov" id="dayModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-top">
+    <div class="header-brand">
+      <div class="header-logo">💊</div>
+      <div class="header-title">
+        <h1>Farmaformula · Simulador de Performance</h1>
+        <p>Abril 2026 · 3 Lojas · 9 Colaboradores · Acompanhamento Diário</p>
+      </div>
+    </div>
+    <div class="header-pills">
+      <div class="pill"><span>Meta Global</span><strong>R$ 165.000</strong></div>
+      <div class="pill"><span>Dias Úteis</span><strong>24 dias</strong></div>
+      <div class="pill"><span>Meta/Dia</span><strong>R$ 6.875</strong></div>
+      <div class="pill"><span>Período</span><strong>Abr/2026</strong></div>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <div class="tab active" onclick="showPage('dashboard')">📊 Dashboard</div>
+    <div class="tab" onclick="showPage('calendario')">📅 Calendário</div>
+    <div class="tab" onclick="showPage('sede')">🏪 Sede · Cruz das Almas</div>
+    <div class="tab" onclick="showPage('cachoeira')">🏪 Cachoeira</div>
+    <div class="tab" onclick="showPage('valenca')">🏪 Valença</div>
+    <div class="tab" onclick="showPage('funcionarios')">👥 Colaboradores</div>
+    <div class="tab" onclick="showPage('bonus')">🏆 Bonificações</div>
+    <div class="tab" onclick="showPage('relatorio')">📋 Relatório Final</div>
+  </div>
+</header>
+
+<div class="container">
+
+<!-- ===================== DASHBOARD ===================== -->
+<div class="page active" id="page-dashboard">
+
+  <div class="alert ai mb20">ℹ️ <span>Simulador de Abril/2026 · Dados completamente simulados com base na estrutura real das planilhas. Use para treinar o acompanhamento diário e projeção de metas.</span></div>
+
+  <div class="stitle">📈 KPIs Gerais — Abril 2026</div>
+  <div class="g5 mb20">
+    <div class="kpi g">
+      <div class="kpi-ico">💰</div>
+      <div class="kpi-lbl">Faturamento Simulado</div>
+      <div class="kpi-val">R$ 152.480</div>
+      <div class="kpi-sub">92,4% da meta global</div>
+      <div class="pb-wrap">
+        <div class="pb-bg"><div class="pb-fill" style="width:92.4%;background:#2e7d32;"></div></div>
+        <div class="pb-lbl"><span>92,4%</span><span>Meta: R$ 165.000</span></div>
+      </div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-ico">🎯</div>
+      <div class="kpi-lbl">Ticket Médio Geral</div>
+      <div class="kpi-val">R$ 163,20</div>
+      <div class="kpi-sub">Meta: R$ 160,00 ✅</div>
+      <div class="pb-wrap">
+        <div class="pb-bg"><div class="pb-fill" style="width:100%;background:#42a5f5;"></div></div>
+        <div class="pb-lbl"><span>Acima da meta</span><span>+2,0%</span></div>
+      </div>
+    </div>
+    <div class="kpi o">
+      <div class="kpi-ico">🔄</div>
+      <div class="kpi-lbl">Taxa de Conversão</div>
+      <div class="kpi-val">84,8%</div>
+      <div class="kpi-sub">Meta: 85% · quase lá ⚠️</div>
+      <div class="pb-wrap">
+        <div class="pb-bg"><div class="pb-fill" style="width:99.8%;background:#e65100;"></div></div>
+        <div class="pb-lbl"><span>-0,2% da meta</span><span>85%</span></div>
+      </div>
+    </div>
+    <div class="kpi p">
+      <div class="kpi-ico">📋</div>
+      <div class="kpi-lbl">Orçamentos Gerados</div>
+      <div class="kpi-val">1.108</div>
+      <div class="kpi-sub">940 vendas fechadas</div>
+      <div class="pb-wrap">
+        <div class="pb-bg"><div class="pb-fill" style="width:84.8%;background:#6a1b9a;"></div></div>
+        <div class="pb-lbl"><span>940 fechados</span><span>168 perdidos</span></div>
+      </div>
+    </div>
+    <div class="kpi r">
+      <div class="kpi-ico">❌</div>
+      <div class="kpi-lbl">Valor Rejeitado</div>
+      <div class="kpi-val">R$ 27.456</div>
+      <div class="kpi-sub">168 orçamentos perdidos</div>
+      <div class="pb-wrap">
+        <div class="pb-bg"><div class="pb-fill" style="width:15.2%;background:#c62828;"></div></div>
+        <div class="pb-lbl"><span>15,2% rejeição</span><span>168 orç.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lojas -->
+  <div class="stitle">🏪 Faturamento por Loja</div>
+  <div class="g3 mb20">
+    <div class="card">
+      <div class="card-header" style="background:linear-gradient(to right,#e8eaf6,white);">
+        <h3><span class="dot ds"></span>Sede · Cruz das Almas</h3>
+        <span class="badge bb">Principal</span>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+          <div><div class="kpi-lbl">Faturamento</div><div style="font-size:1.35rem;font-weight:800;color:var(--primary)">R$ 112.840</div></div>
+          <div style="text-align:right;"><div class="kpi-lbl">% Meta (R$123k)</div><div style="font-size:1.35rem;font-weight:800;color:#2e7d32">91,7%</div></div>
+        </div>
+        <div class="pb-bg mb16"><div class="pb-fill" style="width:91.7%;background:var(--primary);"></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:center;">
+          <div style="background:var(--bg);border-radius:8px;padding:8px;">
+            <div class="emp-stat-l">JAILDA</div>
+            <div style="font-weight:800;font-size:0.9rem;color:#e91e63;">R$ 44.320</div>
+            <div class="emp-stat-l">Balcão</div>
+          </div>
+          <div style="background:var(--bg);border-radius:8px;padding:8px;">
+            <div class="emp-stat-l">DIRLENE</div>
+            <div style="font-weight:800;font-size:0.9rem;color:#9c27b0;">R$ 34.580</div>
+            <div class="emp-stat-l">Balcão</div>
+          </div>
+          <div style="background:var(--bg);border-radius:8px;padding:8px;">
+            <div class="emp-stat-l">THAINA</div>
+            <div style="font-weight:800;font-size:0.9rem;color:#ff9800;">R$ 33.940</div>
+            <div class="emp-stat-l">Balcão</div>
+          </div>
+          <div style="background:var(--bg);border-radius:8px;padding:8px;">
+            <div class="emp-stat-l">TARCIZIO</div>
+            <div style="font-weight:800;font-size:0.9rem;color:#4caf50;">R$ 29.680</div>
+            <div class="emp-stat-l">Teleformula</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px;font-size:0.75rem;flex-wrap:wrap;">
+          <span class="badge bg">4 colaboradores</span>
+          <span class="badge bb">TM: R$171,40</span>
+          <span class="badge by">Conv: 85,1%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header" style="background:linear-gradient(to right,#fff8e1,white);">
+        <h3><span class="dot dc"></span>Farmaformula Cachoeira</h3>
+        <span class="badge by">Filial 2</span>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+          <div><div class="kpi-lbl">Faturamento</div><div style="font-size:1.35rem;font-weight:800;color:#e65100">R$ 28.410</div></div>
+          <div style="text-align:right;"><div class="kpi-lbl">% Meta (R$30k)</div><div style="font-size:1.35rem;font-weight:800;color:#e65100">94,7%</div></div>
+        </div>
+        <div class="pb-bg mb16"><div class="pb-fill" style="width:94.7%;background:#ff9800;"></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center;">
+          <div style="background:var(--bg);border-radius:8px;padding:8px;">
+            <div class="emp-stat-l">DAVID</div>
+            <div style="font-weight:800;font-size:0.9rem;color:#2196f3;">R$ 13.220</div>
+          </div>
+          <div style="background:var(--bg);border-radius:8px;padding:8px;">
+            <div class="emp-stat-l">JACKSON</div>
+            <div style="font-weight:800;font-size:0.9rem;color:#009688;">R$ 10.140</div>
+          </div>
+          <div style="background:var(--bg);border-radius:8px;padding:8px;">
+            <div class="emp-stat-l">BRUNA B.</div>
+            <div style="font-weight:800;font-size:0.9rem;color:#ff5722;">R$ 5.050</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px;font-size:0.75rem;flex-wrap:wrap;">
+          <span class="badge bg">3 colaboradores</span>
+          <span class="badge bb">TM: R$148,80</span>
+          <span class="badge by">Conv: 83,4%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header" style="background:linear-gradient(to right,#e8f5e9,white);">
+        <h3><span class="dot dv"></span>Farmaformula Valença</h3>
+        <span class="badge bg">Filial 3</span>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+          <div><div class="kpi-lbl">Faturamento</div><div style="font-size:1.35rem;font-weight:800;color:#4caf50">R$ 11.230</div></div>
+          <div style="text-align:right;"><div class="kpi-lbl">% Meta (R$12k)</div><div style="font-size:1.35rem;font-weight:800;color:#4caf50">93,6%</div></div>
+        </div>
+        <div class="pb-bg mb16"><div class="pb-fill" style="width:93.6%;background:#4caf50;"></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:center;">
+          <div style="background:var(--bg);border-radius:8px;padding:8px;">
+            <div class="emp-stat-l">STEFANE</div>
+            <div style="font-weight:800;font-size:0.9rem;color:#00897b;">R$ 6.580</div>
+          </div>
+          <div style="background:var(--bg);border-radius:8px;padding:8px;">
+            <div class="emp-stat-l">JESSIKA</div>
+            <div style="font-weight:800;font-size:0.9rem;color:#5c6bc0;">R$ 4.650</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px;font-size:0.75rem;flex-wrap:wrap;">
+          <span class="badge bg">2 colaboradores</span>
+          <span class="badge bb">TM: R$155,00</span>
+          <span class="badge by">Conv: 85,7%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Semanas -->
+  <div class="stitle">📆 Resumo Semanal</div>
+  <div class="week-row mb20">
+    <div class="wk w1">
+      <div class="wk-lbl">Semana 1</div>
+      <div class="wk-sub">31/03 – 04/04</div>
+      <div class="wk-val">R$ 39.820</div>
+      <span class="badge bg">97,1%</span>
+      <div class="spark">
+        <div class="sp" style="height:70%;background:#42a5f5;"></div>
+        <div class="sp" style="height:85%;background:#42a5f5;"></div>
+        <div class="sp" style="height:100%;background:#42a5f5;"></div>
+        <div class="sp" style="height:75%;background:#42a5f5;"></div>
+        <div class="sp" style="height:88%;background:#42a5f5;"></div>
+      </div>
+    </div>
+    <div class="wk w2">
+      <div class="wk-lbl">Semana 2</div>
+      <div class="wk-sub">07/04 – 11/04</div>
+      <div class="wk-val">R$ 43.120</div>
+      <span class="badge bg">105,2%</span>
+      <div class="spark">
+        <div class="sp" style="height:90%;background:#66bb6a;"></div>
+        <div class="sp" style="height:100%;background:#66bb6a;"></div>
+        <div class="sp" style="height:80%;background:#66bb6a;"></div>
+        <div class="sp" style="height:92%;background:#66bb6a;"></div>
+        <div class="sp" style="height:96%;background:#66bb6a;"></div>
+      </div>
+    </div>
+    <div class="wk w3">
+      <div class="wk-lbl">Semana 3</div>
+      <div class="wk-sub">14/04 – 17/04</div>
+      <div class="wk-val">R$ 27.340</div>
+      <span class="badge by">66,7%</span>
+      <div class="spark">
+        <div class="sp" style="height:55%;background:#ffa726;"></div>
+        <div class="sp" style="height:65%;background:#ffa726;"></div>
+        <div class="sp" style="height:40%;background:#ffa726;"></div>
+        <div class="sp" style="height:50%;background:#ffa726;"></div>
+      </div>
+    </div>
+    <div class="wk w4">
+      <div class="wk-lbl">Semana 4</div>
+      <div class="wk-sub">22/04 – 30/04</div>
+      <div class="wk-val">R$ 42.200</div>
+      <span class="badge bg">102,9%</span>
+      <div class="spark">
+        <div class="sp" style="height:72%;background:#ef5350;"></div>
+        <div class="sp" style="height:88%;background:#ef5350;"></div>
+        <div class="sp" style="height:95%;background:#ef5350;"></div>
+        <div class="sp" style="height:100%;background:#ef5350;"></div>
+        <div class="sp" style="height:78%;background:#ef5350;"></div>
+        <div class="sp" style="height:65%;background:#ef5350;"></div>
+      </div>
+    </div>
+    <div class="wk wt">
+      <div class="wk-lbl">Total Mês</div>
+      <div class="wk-sub">Abril 2026</div>
+      <div class="wk-val">R$ 152.480</div>
+      <span class="badge by">92,4% meta</span>
+      <div class="spark">
+        <div class="sp" style="height:97%;background:var(--primary);"></div>
+        <div class="sp" style="height:100%;background:var(--primary);"></div>
+        <div class="sp" style="height:67%;background:var(--primary);"></div>
+        <div class="sp" style="height:100%;background:var(--primary);"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ranking + gráfico -->
+  <div class="g2 mb20">
+    <div class="card">
+      <div class="card-header"><h3>🏆 Ranking de Vendedores — Abril 2026</h3></div>
+      <div class="card-body">
+        <div class="rank-item">
+          <div class="rank-pos rp1">1</div>
+          <div class="rank-info"><div class="rank-name">Jailda</div><div class="rank-store"><span class="dot ds"></span>Sede · Balcão</div></div>
+          <div class="rank-val"><div class="rank-amt">R$ 44.320</div><span class="badge bg">110,8% ✅</span></div>
+        </div>
+        <div class="rank-item">
+          <div class="rank-pos rp2">2</div>
+          <div class="rank-info"><div class="rank-name">Dirlene</div><div class="rank-store"><span class="dot ds"></span>Sede · Balcão</div></div>
+          <div class="rank-val"><div class="rank-amt">R$ 34.580</div><span class="badge by">86,5% ⚠️</span></div>
+        </div>
+        <div class="rank-item">
+          <div class="rank-pos rp3">3</div>
+          <div class="rank-info"><div class="rank-name">Thaina</div><div class="rank-store"><span class="dot ds"></span>Sede · Balcão</div></div>
+          <div class="rank-val"><div class="rank-amt">R$ 33.940</div><span class="badge by">84,9% ⚠️</span></div>
+        </div>
+        <div class="rank-item">
+          <div class="rank-pos rp4">4</div>
+          <div class="rank-info"><div class="rank-name">Tarcizio</div><div class="rank-store"><span class="dot ds"></span>Sede · Teleformula</div></div>
+          <div class="rank-val"><div class="rank-amt">R$ 29.680</div><span class="badge bg">98,9% ✅</span></div>
+        </div>
+        <div class="rank-item">
+          <div class="rank-pos rp4">5</div>
+          <div class="rank-info"><div class="rank-name">David</div><div class="rank-store"><span class="dot dc"></span>Cachoeira</div></div>
+          <div class="rank-val"><div class="rank-amt">R$ 13.220</div><span class="badge bg">110,2% ✅</span></div>
+        </div>
+        <div class="rank-item">
+          <div class="rank-pos rp4">6</div>
+          <div class="rank-info"><div class="rank-name">Jackson</div><div class="rank-store"><span class="dot dc"></span>Cachoeira</div></div>
+          <div class="rank-val"><div class="rank-amt">R$ 10.140</div><span class="badge by">84,5% ⚠️</span></div>
+        </div>
+        <div class="rank-item">
+          <div class="rank-pos rp4">7</div>
+          <div class="rank-info"><div class="rank-name">Stefane</div><div class="rank-store"><span class="dot dv"></span>Valença</div></div>
+          <div class="rank-val"><div class="rank-amt">R$ 6.580</div><span class="badge bg">94,0% ✅</span></div>
+        </div>
+        <div class="rank-item">
+          <div class="rank-pos rp4">8</div>
+          <div class="rank-info"><div class="rank-name">Jessika</div><div class="rank-store"><span class="dot dv"></span>Valença</div></div>
+          <div class="rank-val"><div class="rank-amt">R$ 4.650</div><span class="badge by">93,0% ✅</span></div>
+        </div>
+        <div class="rank-item">
+          <div class="rank-pos rp4">9</div>
+          <div class="rank-info"><div class="rank-name">Bruna Bahia</div><div class="rank-store"><span class="dot dc"></span>Cachoeira</div></div>
+          <div class="rank-val"><div class="rank-amt">R$ 5.050</div><span class="badge br">84,2% ❌</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>📊 Faturamento Visual por Vendedor</h3></div>
+      <div class="card-body">
+        <div class="bar-chart" style="height:180px;">
+          <div class="bar-col"><div class="bar-val">44k</div><div class="bar-fill" style="height:100%;background:#e91e63;"></div><div class="bar-lbl">Jailda</div></div>
+          <div class="bar-col"><div class="bar-val">35k</div><div class="bar-fill" style="height:78%;background:#9c27b0;"></div><div class="bar-lbl">Dirlene</div></div>
+          <div class="bar-col"><div class="bar-val">34k</div><div class="bar-fill" style="height:77%;background:#ff9800;"></div><div class="bar-lbl">Thaina</div></div>
+          <div class="bar-col"><div class="bar-val">30k</div><div class="bar-fill" style="height:67%;background:#4caf50;"></div><div class="bar-lbl">Tarcizio</div></div>
+          <div class="bar-col"><div class="bar-val">13k</div><div class="bar-fill" style="height:30%;background:#2196f3;"></div><div class="bar-lbl">David</div></div>
+          <div class="bar-col"><div class="bar-val">10k</div><div class="bar-fill" style="height:23%;background:#009688;"></div><div class="bar-lbl">Jackson</div></div>
+          <div class="bar-col"><div class="bar-val">7k</div><div class="bar-fill" style="height:15%;background:#00897b;"></div><div class="bar-lbl">Stefane</div></div>
+          <div class="bar-col"><div class="bar-val">5k</div><div class="bar-fill" style="height:11%;background:#ff5722;"></div><div class="bar-lbl">Bruna</div></div>
+          <div class="bar-col"><div class="bar-val">5k</div><div class="bar-fill" style="height:10%;background:#5c6bc0;"></div><div class="bar-lbl">Jessika</div></div>
+        </div>
+        <div class="mt16">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Vendedor</th><th>T. Médio</th><th>Tx. Conv.</th><th>Orç.</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>Jailda</td><td>R$185,00</td><td class="fc-g fw8">86,2%</td><td>239</td><td><span class="badge bg">✅ Superou</span></td></tr>
+                <tr><td>Dirlene</td><td>R$167,00</td><td>85,8%</td><td>207</td><td><span class="badge by">⚠️ Parcial</span></td></tr>
+                <tr><td>Thaina</td><td>R$162,00</td><td>83,6%</td><td>210</td><td><span class="badge by">⚠️ Parcial</span></td></tr>
+                <tr><td>Tarcizio</td><td>R$150,00</td><td>84,7%</td><td>197</td><td><span class="badge by">⚠️ Parcial</span></td></tr>
+                <tr><td>David</td><td>R$138,00</td><td>84,5%</td><td>96</td><td><span class="badge bg">✅ Superou</span></td></tr>
+                <tr><td>Jackson</td><td>R$142,00</td><td>83,2%</td><td>70</td><td><span class="badge by">⚠️ Parcial</span></td></tr>
+                <tr><td>Stefane</td><td>R$158,00</td><td class="fc-g fw8">87,5%</td><td>42</td><td><span class="badge bg">✅ Meta</span></td></tr>
+                <tr><td>Jessika</td><td>R$131,00</td><td>84,8%</td><td>36</td><td><span class="badge by">⚠️ Parcial</span></td></tr>
+                <tr><td>Bruna Bahia</td><td>R$134,00</td><td class="fc-r fw8">80,8%</td><td>38</td><td><span class="badge br">❌ Abaixo</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alertas -->
+  <div class="stitle">⚡ Alertas de Performance</div>
+  <div class="g3">
+    <div class="alert as">✅ <span><strong>Jailda — Destaque do Mês:</strong> Único vendedor a superar 110% da meta individual (R$44.320 vs meta R$40.000). Elegível ao bônus máximo de comissão de 0,6%.</span></div>
+    <div class="alert aw">⚠️ <span><strong>Semana 3 (14–17/04):</strong> Impacto da Páscoa e feriados reduziram faturamento em ~33% abaixo da meta semanal. Semana com apenas 4 dias úteis.</span></div>
+    <div class="alert ad">❌ <span><strong>Bruna Bahia:</strong> Taxa de conversão 80,8% abaixo da meta de 85%. Ticket médio R$134 abaixo da meta R$160. Recomenda-se acompanhamento individualizado.</span></div>
+  </div>
+
+</div>
+
+<!-- ===================== CALENDÁRIO ===================== -->
+<div class="page" id="page-calendario">
+
+  <div class="filter-bar">
+    <span class="fl">Ver loja:</span>
+    <button class="fbtn active" onclick="filterCal('todas',this)">🏢 Todas</button>
+    <button class="fbtn" onclick="filterCal('sede',this)">🏪 Sede</button>
+    <button class="fbtn" onclick="filterCal('cachoeira',this)">🏪 Cachoeira</button>
+    <button class="fbtn" onclick="filterCal('valenca',this)">🏪 Valença</button>
+    <span class="fl" style="margin-left:auto;">Legenda:</span>
+    <div class="cal-legend-item"><div class="leg-box" style="background:#e8f5e9;border-color:#a5d6a7;"></div>Acima da meta</div>
+    <div class="cal-legend-item"><div class="leg-box" style="background:#fff8e1;border-color:#ffe082;"></div>Parcial</div>
+    <div class="cal-legend-item"><div class="leg-box" style="background:#ffebee;border-color:#ef9a9a;"></div>Abaixo</div>
+    <div class="cal-legend-item"><div class="leg-box" style="background:#fff3cd;border-color:#ffc107;"></div>Feriado</div>
+    <div class="cal-legend-item"><div class="leg-box" style="background:#fff8f8;border-color:#ccc;"></div>Domingo</div>
+  </div>
+
+  <div class="alert ai mb20">📅 <span>Clique em qualquer dia útil para ver o detalhamento completo de cada vendedor, indicadores e metas do dia. Dias em <strong>verde</strong> = meta diária atingida.</span></div>
+
+  <div class="cal-wrap mb20" id="cal-todas">
+    <div class="cal-title">
+      <h3>📅 Calendário de Acompanhamento — Abril 2026</h3>
+      <span>Meta diária: R$ 6.875 · 24 dias úteis</span>
+    </div>
+    <div class="cal-days-header">
+      <div class="cal-dh">DOM</div><div class="cal-dh">SEG</div><div class="cal-dh">TER</div>
+      <div class="cal-dh">QUA</div><div class="cal-dh">QUI</div><div class="cal-dh">SEX</div><div class="cal-dh">SÁB</div>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+
+  <!-- Resumo semanal abaixo do cal -->
+  <div class="stitle">📊 Resumo Diário — Totais por Dia</div>
+  <div class="card">
+    <div class="card-body">
+      <div class="tbl-wrap">
+        <table id="dailyTable">
+          <thead>
+            <tr>
+              <th>Data</th><th>Dia</th><th>Loja</th>
+              <th>Jailda</th><th>Dirlene</th><th>Thaina</th><th>Tarcizio</th>
+              <th>David</th><th>Jackson</th><th>Bruna B.</th>
+              <th>Stefane</th><th>Jessika</th>
+              <th>Total Dia</th><th>Meta</th><th>%</th>
+            </tr>
+          </thead>
+          <tbody id="dailyTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== SEDE ===================== -->
+<div class="page" id="page-sede">
+
+  <div class="store-hdr" style="background:linear-gradient(135deg,#1a237e,#283593);">
+    <div>
+      <h2>🏪 Farmaformula Cruz das Almas — SEDE</h2>
+      <p>Unidade principal · 4 colaboradores · Balcão + Teleformula</p>
+    </div>
+    <div class="badges">
+      <div class="store-badge">Meta: R$ 123.000</div>
+      <div class="store-badge">Realizado: R$ 112.840</div>
+      <div class="store-badge">91,7% da meta</div>
+    </div>
+  </div>
+
+  <div class="g4 mb20">
+    <div class="kpi g">
+      <div class="kpi-ico">💰</div><div class="kpi-lbl">Faturamento Balcão</div>
+      <div class="kpi-val">R$ 112.840</div>
+      <div class="kpi-sub">Jailda + Dirlene + Thaina</div>
+      <div class="pb-wrap"><div class="pb-bg"><div class="pb-fill" style="width:91.7%;background:#2e7d32;"></div></div>
+      <div class="pb-lbl"><span>91,7%</span><span>Meta R$123k</span></div></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-ico">📞</div><div class="kpi-lbl">Faturamento Tele</div>
+      <div class="kpi-val">R$ 29.680</div>
+      <div class="kpi-sub">Tarcizio · 98,9% da meta</div>
+      <div class="pb-wrap"><div class="pb-bg"><div class="pb-fill" style="width:98.9%;background:#42a5f5;"></div></div>
+      <div class="pb-lbl"><span>98,9%</span><span>Meta R$30k</span></div></div>
+    </div>
+    <div class="kpi o">
+      <div class="kpi-ico">🎯</div><div class="kpi-lbl">Ticket Médio Sede</div>
+      <div class="kpi-val">R$ 171,40</div>
+      <div class="kpi-sub">Meta: R$160,00 ✅ +7,1%</div>
+      <div class="pb-wrap"><div class="pb-bg"><div class="pb-fill" style="width:100%;background:#e65100;"></div></div>
+      <div class="pb-lbl"><span>Superado</span><span>+R$11,40</span></div></div>
+    </div>
+    <div class="kpi p">
+      <div class="kpi-ico">🔄</div><div class="kpi-lbl">Tx. Conversão Sede</div>
+      <div class="kpi-val">85
+
